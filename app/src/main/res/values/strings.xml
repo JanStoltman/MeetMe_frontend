@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MeetMe</string>
+    <string name="facebook_app_id">407423753052742</string>
+    <string name="fb_login_protocol_scheme">fb407423753052742</string>
+
+    <string name="title_activity_login">LoginActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>
