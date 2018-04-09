@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">MeetMe</string>
+    <string name="shared_pref_file_key">meet_me_shared_prefs</string>
+    <string name="token_pref_key">user_token_pref_key</string>
+    <string name="no_internet_alert">API call failed, check internet connection</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="database_name">my_sqlite_db</string>
+    <string name="map_page_title">Events map</string>
+    <string name="events_list_page_title">Events list</string>
+    <string name="user_profile_page_title">Your profile</string>
+    <string name="save_changes">Save changes</string>
+    <string name="name">Name</string>
+    <string name="surname">Surname</string>
+    <string name="email">Email</string>
+    <string name="phone_number">Phone number</string>
+    <string name="birthday">Birthday</string>
+    <string name="bio">Bio</string>
+    <string name="user_image">user_image</string>
+    <string name="zero_rating">0.0</string>
+    <string name="users_store_key">users_store_shared_pref</string>
+    <string name="events_store_key">events_store_shared_pref</string>
+    <string name="data_saved">Data saved</string>
 </resources>
