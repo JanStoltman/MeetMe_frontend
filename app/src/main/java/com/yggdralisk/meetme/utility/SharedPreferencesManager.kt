@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.yggdralisk.meetme.R
-import com.yggdralisk.meetme.api.models.Event
+import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.User
 
 /**
@@ -75,9 +75,9 @@ class SharedPreferencesManager {
         return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<User>>() {}.type)
     }
 
-    fun storeEvents(context: Context, events: List<Event>) {
+    fun storeEvents(context: Context, eventModels: List<EventModel>) {
         val sharedPref = getSharedPref(context)
-        val json = Gson().toJson(events)
+        val json = Gson().toJson(eventModels)
 
         with(sharedPref.edit()) {
             remove(context.getString(R.string.events_store_key))
@@ -86,11 +86,11 @@ class SharedPreferencesManager {
         }
     }
 
-    fun getEvents(context: Context?): List<Event>? {
+    fun getEvents(context: Context?): List<EventModel>? {
         context ?: return null
 
         val sharedPref = getSharedPref(context)
         val json = sharedPref.getString(context.getString(R.string.token_pref_key), null)
-        return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<Event>>() {}.type)
+        return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<EventModel>>() {}.type)
     }
 }

@@ -1,6 +1,6 @@
 package com.yggdralisk.meetme.api.interfaces
 
-import com.yggdralisk.meetme.api.models.Event
+import com.yggdralisk.meetme.api.models.EventModel
 import retrofit2.Call
 import retrofit2.http.GET
 
@@ -9,5 +9,5 @@ import retrofit2.http.GET
  */
 interface EventInterface {
     @GET("/api/Events")
-    fun getEvents() : Call<List<Event>>
+    fun getEvents() : Call<List<EventModel>>
 }

@@ -14,7 +14,7 @@ import com.yggdralisk.meetme.utility.SharedPreferencesManager
 class MockApplication : Application() {
     companion object {
         val mockUsers: ArrayList<User> = createUsers()
-        val mockEvents: ArrayList<Event> = createEvents()
+        val mockEvents: ArrayList<EventModel> = createEvents()
 
         private fun createUsers(): ArrayList<User> {
             val l: ArrayList<User> = ArrayList()
@@ -32,10 +32,10 @@ class MockApplication : Application() {
             return l
         }
 
-        private fun createEvents(): ArrayList<Event> {
-            val l: ArrayList<Event> = ArrayList()
+        private fun createEvents(): ArrayList<EventModel> {
+            val l: ArrayList<EventModel> = ArrayList()
 
-            l.add(Event(
+            l.add(EventModel(
                     1, "MockEvent1", listOf(2, 3), 1,
                     1523344142, 2, AgeRestriction(1, 100),
                     EventType.PUBLIC,
@@ -43,7 +43,7 @@ class MockApplication : Application() {
                     1523344142, 1523351342, QrCode("")
             ))
 
-            l.add(Event(
+            l.add(EventModel(
                     2, "MockEvent2", listOf(1), 2,
                     1523344142, 2, AgeRestriction(1, 100),
                     EventType.PRIVATE,
@@ -55,7 +55,7 @@ class MockApplication : Application() {
         }
 
         /**
-         * Reads events from shared prefences and overwrites mockEvents
+         * Reads EVENT_MODELS from shared prefences and overwrites mockEvents
          */
         fun readEvents(context: Context) {
             val l = SharedPreferencesManager().getEvents(context)

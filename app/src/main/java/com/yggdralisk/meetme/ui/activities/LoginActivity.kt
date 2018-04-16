@@ -11,6 +11,10 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import com.facebook.*
+import com.facebook.appevents.AppEventsLogger
+import com.facebook.login.LoginManager
+import com.facebook.login.LoginResult
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.APIGenerator
 import com.yggdralisk.meetme.api.MyCallback
@@ -22,18 +26,44 @@ import retrofit2.Response
 
 class LoginActivity : AppCompatActivity() {
     companion object {
-        private const val MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION =1;
+        private const val MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
+        private const val EMAIL: String = "email";
     }
+
+    private val callbackManager = CallbackManager.Factory.create()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_main)
-        askForPermissions()
-        if (checkToken() || true) { //TODO remove true once gearhost is up
+        loginButton.setReadPermissions(listOf(EMAIL))
+
+        if (checkToken()) {
             askForPermissions()
         } else {
-            getAccountProviders()
+            loginButton.registerCallback(callbackManager,  object : FacebookCallback<LoginResult> {
+                override fun onSuccess(result: LoginResult?) {
+                    loginButton.visibility = View.INVISIBLE
+                    loadingSpinner.visibility = View.VISIBLE
+                    askForPermissions()
+                }
+
+                override fun onCancel() {
+                    Toast.makeText(applicationContext,applicationContext.getString(R.string.provider_cancel),Toast.LENGTH_LONG).show()
+                }
+
+                override fun onError(error: FacebookException?) {
+                    Toast.makeText(applicationContext,applicationContext.getString(R.string.error_occured),Toast.LENGTH_LONG).show()
+                }
+            })
         }
+
+        FacebookSdk.sdkInitialize(applicationContext)
+        AppEventsLogger.activateApp(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        super.onActivityResult(requestCode, resultCode, data)
+        callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun askForPermissions() {
@@ -42,7 +72,7 @@ class LoginActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this,
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
-        }else{
+        } else {
             proceedToMap()
         }
     }
@@ -65,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
     private fun displayPossibleAccounts(responses: List<ExternalLogin>?) {
         loadingSpinner.visibility = View.GONE
         if (responses != null) {
-            for(response in responses) {
+            for (response in responses) {
                 val b = Button(baseContext)
                 b.text = response.name
                 b.setOnClickListener {
@@ -92,16 +122,14 @@ class LoginActivity : AppCompatActivity() {
      *
      * @return true if there is a user logged in and token is still valid, false otherwise
      */
-    fun checkToken(): Boolean {
-        return false
+    private fun checkToken(): Boolean {
+        return AccessToken.getCurrentAccessToken() != null
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    proceedToMap()
-                }
+                proceedToMap()
                 return
             }
 

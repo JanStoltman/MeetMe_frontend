@@ -2,7 +2,7 @@ package com.yggdralisk.meetme.api.calls
 
 import com.yggdralisk.meetme.api.APIGenerator
 import com.yggdralisk.meetme.api.interfaces.EventInterface
-import com.yggdralisk.meetme.api.models.Event
+import com.yggdralisk.meetme.api.models.EventModel
 import retrofit2.Callback
 
 /**
@@ -10,7 +10,7 @@ import retrofit2.Callback
  */
 class EventCalls {
     companion object {
-        fun getEvents(callback: Callback<List<Event>>) {
+        fun getEvents(callback: Callback<List<EventModel>>) {
             val call = APIGenerator.createService(EventInterface::class.java).getEvents()
             call.enqueue(callback)
         }

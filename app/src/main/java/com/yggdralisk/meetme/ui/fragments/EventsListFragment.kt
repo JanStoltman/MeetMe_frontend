@@ -15,12 +15,21 @@ import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.models.User
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity.Companion.EVENT_ID
-import com.yggdralisk.meetme.ui.activities.EventsActivity
+import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
+import kotlinx.android.synthetic.main.events_list_frgment.*
 
 /**
  * Created by Jan Stoltman on 4/8/18.
  */
 class EventsListFragment : Fragment() {
+    companion object {
+        var provider: EventsListProviderInterface? = null
+        fun newInstance(provider: EventsListProviderInterface): EventsListFragment {
+            this.provider = provider
+            return EventsListFragment()
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View? = inflater?.inflate(R.layout.events_list_frgment, container, false)
         val recyclerView: RecyclerView? = view?.findViewById(R.id.recyclerView)
@@ -42,27 +51,31 @@ class EventsListFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-            val event = EventsActivity.events[position]
-            holder?.rowView?.findViewById<TextView>(R.id.eventName)?.text = event.name
-            holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event.guests?.size, event.guestLimit)
+            val event = provider?.getEvents()?.get(position)
+            holder?.rowView?.findViewById<TextView>(R.id.eventName)?.text = event?.name
+            holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size, event?.guestLimit)
 
-            if (event.guestLimit == null || event.guests == null || event.guestLimit!! > event.guests!!.size) {
+            if (event?.guestLimit == null || event.guests == null || event.guestLimit!! > event.guests!!.size) {
                 holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
             }
 
-            val creator: User = MockApplication.mockUsers.filter { user -> user.id == event.creator }[0]
+            val creator: User = MockApplication.mockUsers.filter { user -> user.id == event?.creator }[0]
             holder?.rowView?.findViewById<TextView>(R.id.creatorName)?.text = String.format("%s %s", creator.name, creator.surname)
             holder?.rowView?.findViewById<TextView>(R.id.creatorScore)?.text = String.format("%.2f", creator.rating)
 
             holder?.rowView?.setOnClickListener({
                 val intent = Intent(context, EventDetailsActivity::class.java)
-                intent.putExtra(EVENT_ID, event.id)
+                intent.putExtra(EVENT_ID, event?.id)
                 context.startActivity(intent)
             })
         }
 
         override fun getItemCount(): Int {
-            return EventsActivity.events.size
+            return provider?.getEvents()?.size ?: 0
         }
+    }
+
+    fun refreshEvents() {
+        recyclerView?.adapter?.notifyDataSetChanged()
     }
 }

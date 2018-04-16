@@ -34,5 +34,4 @@ class APIGenerator {
             return retrofit.create(serviceClass)
         }
     }
-
 }
