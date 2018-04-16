@@ -25,6 +25,7 @@ class EventsActivity : FragmentActivity(), EventsListProviderInterface {
         setContentView(R.layout.activity_events)
 
         pagerAdapter = EventsPagerAdapter(supportFragmentManager, this, this)
+        events.addAll(MockApplication.mockEvents)
 
         viewPager.adapter = pagerAdapter
         viewPager.offscreenPageLimit = 2
@@ -38,7 +39,7 @@ class EventsActivity : FragmentActivity(), EventsListProviderInterface {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
                 if (response != null && response.isSuccessful && response.body() != null) {
                     events.clear()
-                    MockApplication.mockEvents.addAll(response.body() as List<EventModel>)
+                    MockApplication.mockEvents.addAll(response.body() as List<EventModel>)//TODO: Change
                     events.addAll(MockApplication.mockEvents)
                     pagerAdapter?.refreshEvents()
                 }

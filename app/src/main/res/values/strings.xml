@@ -24,4 +24,7 @@
     <string name="fb_login_protocol_scheme">fb1422598784536189</string>
     <string name="provider_cancel">Login canceled</string>
     <string name="error_occured">Error occured</string>
+    <string name="guests">Guests:</string>
+    <string name="join">Join</string>
+    <string name="event_full">Event is full :(</string>
 </resources>
