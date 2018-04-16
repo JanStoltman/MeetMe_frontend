@@ -1,6 +1,7 @@
 package com.yggdralisk.meetme.ui.activities
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -18,7 +19,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.yggdralisk.meetme.MockApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.models.EventModel
-import com.yggdralisk.meetme.api.models.User
+import com.yggdralisk.meetme.api.models.UserModel
 import kotlinx.android.synthetic.main.activity_event_details.*
 
 
@@ -77,8 +78,14 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 view = LayoutInflater.from(context).inflate(R.layout.guest_list_element, parent, false)
             }
 
-            val currentItem = getItem(position) as User?
+            val currentItem = getItem(position) as UserModel?
             view?.findViewById<TextView>(R.id.userName)?.text = currentItem?.name ?: "Error"
+
+            view?.setOnClickListener {
+                val intent = Intent(context, UserProfileActivity::class.java)
+                intent.putExtra(UserProfileActivity.USER_ID, currentItem?.id)
+                context.startActivity(intent)
+            }
             return view!!
         }
 

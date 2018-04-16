@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.yggdralisk.meetme.MockApplication
 import com.yggdralisk.meetme.R
-import com.yggdralisk.meetme.api.models.User
+import com.yggdralisk.meetme.api.models.UserModel
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity.Companion.EVENT_ID
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
@@ -59,7 +59,7 @@ class EventsListFragment : Fragment() {
                 holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
             }
 
-            val creator: User = MockApplication.mockUsers.filter { user -> user.id == event?.creator }[0]
+            val creator: UserModel = MockApplication.mockUsers.filter { user -> user.id == event?.creator }[0]
             holder?.rowView?.findViewById<TextView>(R.id.creatorName)?.text = String.format("%s %s", creator.name, creator.surname)
             holder?.rowView?.findViewById<TextView>(R.id.creatorScore)?.text = String.format("%.2f", creator.rating)
 

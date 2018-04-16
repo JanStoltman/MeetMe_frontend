@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.models.EventModel
-import com.yggdralisk.meetme.api.models.User
+import com.yggdralisk.meetme.api.models.UserModel
 
 /**
  * Created by Jan Stoltman on 4/7/18.
@@ -56,7 +56,7 @@ class SharedPreferencesManager {
                 null) != null)
     }
 
-    fun storeUsers(context: Context, users: List<User>) {
+    fun storeUsers(context: Context, users: List<UserModel>) {
         val sharedPref = getSharedPref(context)
         val json = Gson().toJson(users)
 
@@ -67,12 +67,12 @@ class SharedPreferencesManager {
         }
     }
 
-    fun getUsers(context: Context?): List<User>? {
+    fun getUsers(context: Context?): List<UserModel>? {
         context ?: return null
 
         val sharedPref = getSharedPref(context)
         val json = sharedPref.getString(context.getString(R.string.users_store_key), null)
-        return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<User>>() {}.type)
+        return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<UserModel>>() {}.type)
     }
 
     fun storeEvents(context: Context, eventModels: List<EventModel>) {

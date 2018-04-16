@@ -123,6 +123,7 @@ class LoginActivity : AppCompatActivity() {
      * @return true if there is a user logged in and token is still valid, false otherwise
      */
     private fun checkToken(): Boolean {
+        val token = AccessToken.getCurrentAccessToken()
         return AccessToken.getCurrentAccessToken() != null
     }
 

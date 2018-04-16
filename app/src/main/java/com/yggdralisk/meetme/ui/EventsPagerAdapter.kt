@@ -86,7 +86,7 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
             2 -> {
                 userProfileFragmentRef = WeakReference(UserProfileFragment.newInstance())
                 userProfileFragmentRef?.get()!!
-            } //User profile
+            } //UserModel profile
             else -> throw IndexOutOfBoundsException(position.toString() + " :View pager position not found")
         }
     }
