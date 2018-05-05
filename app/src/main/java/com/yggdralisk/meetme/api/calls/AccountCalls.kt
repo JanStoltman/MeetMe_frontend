@@ -1,8 +1,8 @@
 package com.yggdralisk.meetme.api.calls
 
 import com.yggdralisk.meetme.api.APIGenerator
-import com.yggdralisk.meetme.api.interfaces.AccountInterface
-import com.yggdralisk.meetme.api.models.ExternalLogin
+import com.yggdralisk.meetme.api.interfaces.UsersInterface
+import com.yggdralisk.meetme.api.models.RegisterModel
 import okhttp3.ResponseBody
 import retrofit2.Callback
 
@@ -11,13 +11,15 @@ import retrofit2.Callback
  */
 class AccountCalls {
     companion object {
-        fun getPossibleExternalLogins(callback: Callback<List<ExternalLogin>>) {
-            val call = APIGenerator.createService(AccountInterface::class.java).getPossibleExternalLogins()
+        fun registerUser(registerModel: RegisterModel, callback: Callback<ResponseBody>) {
+            val call = APIGenerator.createService(UsersInterface::class.java)
+                    .registerUser(registerModel)
             call.enqueue(callback)
         }
 
-        fun redirectToLogin(url: String, callback: Callback<ResponseBody>){
-            val call = APIGenerator.createService(AccountInterface::class.java).redirectToLogin(url)
+        fun getMyId(callback: Callback<String?>) {
+            val call = APIGenerator.createService(UsersInterface::class.java)
+                    .getMyId()
             call.enqueue(callback)
         }
     }

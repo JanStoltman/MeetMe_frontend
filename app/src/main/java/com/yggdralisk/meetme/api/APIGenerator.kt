@@ -1,6 +1,9 @@
 package com.yggdralisk.meetme.api
 
+import com.facebook.AccessToken
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,7 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
  */
 class APIGenerator {
     companion object {
-        const val BASE_URL: String = "http://zpimeetme.gear.host"
+        const val BASE_URL: String = "http://zpimeetme.azurewebsites.net"
 
         private val builder: Retrofit.Builder = Retrofit
                 .Builder()
@@ -28,6 +31,19 @@ class APIGenerator {
         fun <S> createService(serviceClass: Class<S>): S {
             if(!httpClient.interceptors().contains(logging)){
                 httpClient.addInterceptor(logging)
+
+                if(AccessToken.getCurrentAccessToken() != null){
+                    httpClient.addInterceptor {
+                        val original = it.request()
+                        val request = original.newBuilder()
+                                .header("Authorization", AccessToken.getCurrentAccessToken().toString())
+                                .method(original.method(), original.body())
+                                .build()
+
+                        it.proceed(request)
+                    }
+                }
+
                 builder.client(httpClient.build())
                 retrofit = builder.build()
             }

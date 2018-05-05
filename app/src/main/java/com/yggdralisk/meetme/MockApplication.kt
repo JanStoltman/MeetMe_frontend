@@ -20,15 +20,14 @@ class MockApplication : Application() {
             val l: ArrayList<UserModel> = ArrayList()
 
             l.add(UserModel(1, "Jan", "Stoltman", "stoltmanjan@gmail.com",
-                    "985632458", 826502400, "My bio", "https://cdn-images-1.medium.com/max/1200/0*UCnZgM0r8e-Apv1d.", 4.54))
+                    "985632458", "My bio", "https://cdn-images-1.medium.com/max/1200/0*UCnZgM0r8e-Apv1d.", 4.54, 0, "", "" , 0))
 
             l.add(UserModel(2, "Konrad", "Wallenrod", "k.wallenrod@gmail.com",
-                    "985632458", 883612800, "Konrad Wallenrod is an 1828 narrative poem, in Polish, by Adam Mickiewicz, set in the 14th-century Grand Duchy of Lithuania.",
-                    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Alf_i_Halban.jpg/220px-Alf_i_Halban.jpg", 2.23))
+                    "985632458", "Konrad Wallenrod is an 1828 narrative poem, in Polish, by Adam Mickiewicz, set in the 14th-century Grand Duchy of Lithuania.",
+                    "https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Alf_i_Halban.jpg/220px-Alf_i_Halban.jpg", 2.230, 0,"", "" , 0))
 
             l.add(UserModel(3, "Wojciech", "Wojcieszewski", "wszewski@gmail.com",
-                    "985632458", 855964800, "My bio", "", 5.00))
-
+                    "985632458", "My bio", "", 5.000, 0,"", "" , 0))
             return l
         }
 
