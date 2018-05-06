@@ -2,7 +2,7 @@ package com.yggdralisk.meetme.ui.activities
 
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import com.yggdralisk.meetme.MockApplication
+import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.EventCalls
@@ -13,7 +13,7 @@ import kotlinx.android.synthetic.main.activity_events.*
 import retrofit2.Call
 import retrofit2.Response
 
-class EventsActivity : FragmentActivity(), EventsListProviderInterface {
+class MainActivity : FragmentActivity(), EventsListProviderInterface {
     companion object {
         val events: ArrayList<EventModel> = ArrayList()
     }
@@ -25,7 +25,6 @@ class EventsActivity : FragmentActivity(), EventsListProviderInterface {
         setContentView(R.layout.activity_events)
 
         pagerAdapter = EventsPagerAdapter(supportFragmentManager, this, this)
-        events.addAll(MockApplication.mockEvents)
 
         viewPager.adapter = pagerAdapter
         viewPager.offscreenPageLimit = 2
@@ -39,8 +38,7 @@ class EventsActivity : FragmentActivity(), EventsListProviderInterface {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
                 if (response != null && response.isSuccessful && response.body() != null) {
                     events.clear()
-                    MockApplication.mockEvents.addAll(response.body() as List<EventModel>)//TODO: Change
-                    events.addAll(MockApplication.mockEvents)
+                    events.addAll(response.body() as List<EventModel>)
                     pagerAdapter?.refreshEvents()
                 }
             }

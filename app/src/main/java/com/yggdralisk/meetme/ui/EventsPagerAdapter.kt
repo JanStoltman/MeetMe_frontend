@@ -95,7 +95,7 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
         googleMap?.clear()
 
         for (event in provider.getEvents()) {
-            val pos = LatLng(event.location?.lat!!, event.location?.lon!!) //TODO: check if lat/lon is null and throw error if true
+            val pos = LatLng(event.latitude!!, event.longitude!!) //TODO: check if lat/lon is null and throw error if true
             val marker: MarkerOptions = MarkerOptions()
                     .position(pos)
                     .title(String.format("%d .%s", event.id, event.name))

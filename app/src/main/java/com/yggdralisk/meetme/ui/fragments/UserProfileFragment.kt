@@ -11,8 +11,13 @@ import com.facebook.GraphRequest
 import com.facebook.HttpMethod
 import com.facebook.login.LoginManager
 import com.nostra13.universalimageloader.core.ImageLoader
-import com.yggdralisk.meetme.MockApplication
+import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
+import com.yggdralisk.meetme.api.MyCallback
+import com.yggdralisk.meetme.api.calls.UsersCalls
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Response
 
 /**
  * Created by Jan Stoltman on 4/8/18.
@@ -33,6 +38,7 @@ class UserProfileFragment : Fragment() {
         })
         return view
     }
+
     private fun disconnectFromFacebook() {
         if (AccessToken.getCurrentAccessToken() == null) {
             this.activity.finish()
@@ -47,29 +53,34 @@ class UserProfileFragment : Fragment() {
     }
 
     private fun saveUserData() {
-        val user = MockApplication.mockUsers[0]
-        user.name = view?.findViewById<EditText>(R.id.nameTextView)?.text.toString()
-        user.surname = view?.findViewById<EditText>(R.id.surnameTextView)?.text.toString()
-        user.email = view?.findViewById<EditText>(R.id.emailTextView)?.text.toString()
-        user.phoneNumber = view?.findViewById<EditText>(R.id.phoneTextView)?.text.toString()
-        //user.birthDay = view?.findViewById<EditText>(R.id.birthdateTextView)?.text.toString().toLong()
-        user.bio = view?.findViewById<EditText>(R.id.bioTextView)?.text.toString()
+        MyApplication.currentUser?.let {
+            val user = MyApplication.currentUser
+            user?.name = view?.findViewById<EditText>(R.id.nameTextView)?.text.toString()
+            user?.surname = view?.findViewById<EditText>(R.id.surnameTextView)?.text.toString()
+            user?.email = view?.findViewById<EditText>(R.id.emailTextView)?.text.toString()
+            user?.phoneNumber = view?.findViewById<EditText>(R.id.phoneTextView)?.text.toString()
+            //user.birthDay = view?.findViewById<EditText>(R.id.birthdateTextView)?.text.toString().toLong()
+            user?.bio = view?.findViewById<EditText>(R.id.bioTextView)?.text.toString()
 
-        MockApplication.mockUsers[0] = user
-        MockApplication.saveUsers(context) //TODO: add data validation
-        Toast.makeText(context, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
+            UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(context) {
+                override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                    super.onResponse(call, response)
+                    Toast.makeText(context, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
+                }
+            })
+        }
     }
 
     private fun readUserData(view: View?) {
-        val user = MockApplication.mockUsers[0]
-        ImageLoader.getInstance().displayImage(user.photoImage, view?.findViewById<ImageView>(R.id.imageView))
-        view?.findViewById<EditText>(R.id.nameTextView)?.setText(user.name)
-        view?.findViewById<EditText>(R.id.surnameTextView)?.setText(user.surname)
-        view?.findViewById<EditText>(R.id.emailTextView)?.setText(user.email)
-        view?.findViewById<EditText>(R.id.phoneTextView)?.setText(user.phoneNumber)
+        val user = MyApplication.currentUser
+        ImageLoader.getInstance().displayImage(user?.photoImage, view?.findViewById<ImageView>(R.id.imageView))
+        view?.findViewById<EditText>(R.id.nameTextView)?.setText(user?.name)
+        view?.findViewById<EditText>(R.id.surnameTextView)?.setText(user?.surname)
+        view?.findViewById<EditText>(R.id.emailTextView)?.setText(user?.email)
+        view?.findViewById<EditText>(R.id.phoneTextView)?.setText(user?.phoneNumber)
         // view?.findViewById<EditText>(R.id.birthdateTextView)?.setText(user.birthDay.toString())
-        view?.findViewById<EditText>(R.id.bioTextView)?.setText(user.bio)
-        view?.findViewById<TextView>(R.id.userRating)?.text = String.format("%.2f", user.rating)
+        view?.findViewById<EditText>(R.id.bioTextView)?.setText(user?.bio)
+        view?.findViewById<TextView>(R.id.userRating)?.text = String.format("%.2f", user?.rating)
 
         view?.findViewById<Button>(R.id.saveButton)?.setOnClickListener { saveUserData() }
     }

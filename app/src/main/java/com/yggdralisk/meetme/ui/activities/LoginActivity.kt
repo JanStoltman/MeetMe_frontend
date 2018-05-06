@@ -12,8 +12,14 @@ import android.widget.Toast
 import com.facebook.*
 import com.facebook.appevents.AppEventsLogger
 import com.facebook.login.LoginResult
+import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
+import com.yggdralisk.meetme.api.MyCallback
+import com.yggdralisk.meetme.api.calls.UsersCalls
+import com.yggdralisk.meetme.api.models.UserModel
 import kotlinx.android.synthetic.main.activity_login_main.*
+import retrofit2.Call
+import retrofit2.Response
 
 
 class LoginActivity : AppCompatActivity() {
@@ -71,20 +77,49 @@ class LoginActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
         } else {
+            getId()
             proceedToMap()
         }
     }
 
     private fun proceedToMap() {
-        startActivity(Intent(applicationContext, EventsActivity::class.java))
-        this.finish()
+        startActivity(Intent(applicationContext, MainActivity::class.java))
     }
 
     private fun registerUser() {
         if (AccessToken.getCurrentAccessToken() != null) {
-
+            Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().token}", Toast.LENGTH_LONG).show()
+            UsersCalls.registerUser(hashMapOf(Pair("Token", AccessToken.getCurrentAccessToken().token)),
+                    object : MyCallback<Int>(this) {
+                        override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
+                            super.onResponse(call, response)
+                            MyApplication.userId = response?.body() ?: 0
+                            getId()
+                        }
+                    })
         }
     }
+
+    private fun getId() {
+        UsersCalls.getMyId(object : MyCallback<Int>(this) {
+            override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
+                super.onResponse(call, response)
+                MyApplication.userId = response?.body() ?: 0
+                getUser(MyApplication.userId)
+            }
+        })
+    }
+
+    private fun getUser(id: Int){
+        UsersCalls.getUserById(id, object : MyCallback<UserModel>(this) {
+            override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
+                super.onResponse(call, response)
+                MyApplication.currentUser = response?.body()
+                proceedToMap()
+            }
+        })
+    }
+
 
     /**
      * Function which checks if there is any user currently logged in

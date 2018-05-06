@@ -14,5 +14,10 @@ class EventCalls {
             val call = APIGenerator.createService(EventInterface::class.java).getEvents()
             call.enqueue(callback)
         }
+
+        fun getEventById(id:Int, callback: Callback<EventModel>) {
+            val call = APIGenerator.createService(EventInterface::class.java).getEventById(id)
+            call.enqueue(callback)
+        }
     }
 }

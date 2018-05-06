@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ListAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -16,11 +17,17 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.yggdralisk.meetme.MockApplication
+import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
+import com.yggdralisk.meetme.api.MyCallback
+import com.yggdralisk.meetme.api.calls.EventCalls
+import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
+import com.yggdralisk.meetme.api.models.SimpleUserModel
 import com.yggdralisk.meetme.api.models.UserModel
 import kotlinx.android.synthetic.main.activity_event_details.*
+import retrofit2.Call
+import retrofit2.Response
 
 
 class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -29,28 +36,37 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     var eventToDisplay: EventModel? = null
+    var eventGuests: ArrayList<SimpleUserModel> = arrayListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_event_details)
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
-        eventToDisplay = MockApplication.mockEvents.find { event -> event.id == eventId }
+        EventCalls.getEventById(eventId, object:MyCallback<EventModel>(this){
+            override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                super.onResponse(call, response)
+                eventToDisplay = response?.body()
+                getEvent()
+            }
+        })
 
+
+    }
+
+    private fun getEvent() {
         popoulateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
 
         if (eventToDisplay?.guestLimit!! <= eventToDisplay?.guests?.size!!) joinButton.text = this.getText(R.string.event_full)
 
-        joinButton.setOnClickListener({ Toast.makeText(this, "Empty stub", Toast.LENGTH_SHORT).show()})
-
+        joinButton.setOnClickListener({ Toast.makeText(this, "Empty stub", Toast.LENGTH_SHORT).show() }) //TODO: add join events
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
         googleMap?.setMinZoomPreference(14f)
 
-        val loc = eventToDisplay?.location
-        val pos = LatLng(loc?.lat!!, loc.lon!!)//TODO: handle lack of permission
+        val pos = LatLng(eventToDisplay?.latitude!!, eventToDisplay?.longitude!!)//TODO: handle lack of permission
         val marker: MarkerOptions = MarkerOptions()
                 .position(pos)
 
@@ -61,45 +77,57 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun popoulateUI() {
         eventName.text = eventToDisplay?.name ?: "Error"
 
-        val creator = MockApplication.mockUsers.find { event -> event.id == eventToDisplay?.id ?: 1 }
-        creatorName.text = creator?.name ?: "Error"
+        getCreator()
 
         val ageRestriction = eventToDisplay?.ageRestriction
         ageRestrictions.text = "Age: min.${ageRestriction?.minAge} max.${ageRestriction?.maxAge}"
 
-        guestsList.adapter = MyAdapter(eventToDisplay?.guests, this)
+        guestsList.adapter = MyAdapter(eventGuests, this)
+        getGuests()
     }
 
+    private fun getGuests() {
+        UsersCalls.getNamesForIds(eventToDisplay?.guests!!, object:MyCallback<List<SimpleUserModel>>(this){
+            override fun onResponse(call: Call<List<SimpleUserModel>>?, response: Response<List<SimpleUserModel>>?) {
+                super.onResponse(call, response)
+                eventGuests.addAll(response?.body() ?: listOf())
+                (guestsList?.adapter as MyAdapter).notifyDataSetChanged()
+            }
+        })
+    }
 
-    class MyAdapter(val guests: List<Int>?, val context: Context) : BaseAdapter() {
+    private fun getCreator() {
+        UsersCalls.getUserById(eventToDisplay?.creator!!, object: MyCallback<UserModel>(this){
+            override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
+                super.onResponse(call, response)
+                creatorName.text = response?.body()?.name ?: "Error"
+            }
+        })
+    }
+
+    class MyAdapter(val guests: List<SimpleUserModel>, val context: Context) : BaseAdapter() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
             var view = convertView
             if (view == null) {
                 view = LayoutInflater.from(context).inflate(R.layout.guest_list_element, parent, false)
             }
 
-            val currentItem = getItem(position) as UserModel?
-            view?.findViewById<TextView>(R.id.userName)?.text = currentItem?.name ?: "Error"
+            val currentItem = getItem(position) as SimpleUserModel
+            view?.findViewById<TextView>(R.id.userName)?.text = "$currentItem.firstName ${currentItem.lastName}"
 
             view?.setOnClickListener {
                 val intent = Intent(context, UserProfileActivity::class.java)
-                intent.putExtra(UserProfileActivity.USER_ID, currentItem?.id)
+                intent.putExtra(UserProfileActivity.USER_ID, currentItem.id)
                 context.startActivity(intent)
             }
             return view!!
         }
 
-        override fun getItem(position: Int): Any? {
-            return MockApplication.mockUsers.find { user -> user.id == guests?.get(position) }
-        }
+        override fun getItem(position: Int): Any? = guests[position]
 
-        override fun getItemId(position: Int): Long {
-            return guests?.get(position)?.toLong()!!
-        }
+        override fun getItemId(position: Int): Long = guests[position].id.toLong()
 
-        override fun getCount(): Int {
-            return guests?.size ?: 0
-        }
+        override fun getCount(): Int = guests.size
 
     }
 
