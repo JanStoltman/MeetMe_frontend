@@ -1,5 +1,6 @@
 package com.yggdralisk.meetme.ui.activities
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
 import com.yggdralisk.meetme.MyApplication
@@ -31,6 +32,16 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         tabLayout.setupWithViewPager(viewPager)
         setupTabIcons()
         callEvents()
+
+        addEventButton.setOnClickListener({
+            startAddEventActivity()
+        })
+    }
+
+    private fun startAddEventActivity() {
+        val intent = Intent(this, AddEventActivity::class.java)
+
+        startActivity(intent)
     }
 
     private fun callEvents() {

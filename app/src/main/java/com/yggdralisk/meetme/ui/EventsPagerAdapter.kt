@@ -67,12 +67,12 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
 
                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-                        googleMap.isMyLocationEnabled = true //TODO: move camera to user's location
+                        googleMap.isMyLocationEnabled = true
 
-                        val sydney = LatLng(51.108081, 17.065134)//TODO: Change this when ^that one is done
+                        val sydney = LatLng(51.108081, 17.065134)
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
                     } else {
-                        val sydney = LatLng(51.108081, 17.065134)//TODO: handle lack of permission
+                        val sydney = LatLng(51.108081, 17.065134)
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
                     }
                 }

@@ -35,8 +35,8 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login_main)
         loginButton.setReadPermissions(listOf(EMAIL))
 
-        if (checkToken()) {
-            askForPermissions()
+        if (checkFacebookToken()) {
+            getId()
         } else {
             setupLoginBUtton()
         }
@@ -77,7 +77,6 @@ class LoginActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
         } else {
-            getId()
             proceedToMap()
         }
     }
@@ -93,7 +92,6 @@ class LoginActivity : AppCompatActivity() {
                     object : MyCallback<Int>(this) {
                         override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
                             super.onResponse(call, response)
-                            MyApplication.userId = response?.body() ?: 0
                             getId()
                         }
                     })
@@ -104,18 +102,22 @@ class LoginActivity : AppCompatActivity() {
         UsersCalls.getMyId(object : MyCallback<Int>(this) {
             override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
                 super.onResponse(call, response)
-                MyApplication.userId = response?.body() ?: 0
-                getUser(MyApplication.userId)
+                if(response?.isSuccessful == false){
+                    registerUser()
+                }else {
+                    MyApplication.userId = response?.body() ?: 0
+                    getUser(MyApplication.userId)
+                }
             }
         })
     }
 
-    private fun getUser(id: Int){
+    private fun getUser(id: Int) {
         UsersCalls.getUserById(id, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
                 MyApplication.currentUser = response?.body()
-                proceedToMap()
+                askForPermissions()
             }
         })
     }
@@ -127,7 +129,7 @@ class LoginActivity : AppCompatActivity() {
      *
      * @return true if there is a user logged in and token is still valid, false otherwise
      */
-    private fun checkToken(): Boolean {
+    private fun checkFacebookToken(): Boolean {
         return AccessToken.getCurrentAccessToken() != null
     }
 
