@@ -15,6 +15,7 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.UsersCalls
+import com.yggdralisk.meetme.utility.TimestampManager
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -59,7 +60,6 @@ class UserProfileFragment : Fragment() {
             user?.surname = view?.findViewById<EditText>(R.id.surnameTextView)?.text.toString()
             user?.email = view?.findViewById<EditText>(R.id.emailTextView)?.text.toString()
             user?.phoneNumber = view?.findViewById<EditText>(R.id.phoneTextView)?.text.toString()
-            //user.birthDay = view?.findViewById<EditText>(R.id.birthdateTextView)?.text.toString().toLong()
             user?.bio = view?.findViewById<EditText>(R.id.bioTextView)?.text.toString()
 
             UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(context!!) {
@@ -78,7 +78,6 @@ class UserProfileFragment : Fragment() {
         view?.findViewById<EditText>(R.id.surnameTextView)?.setText(user?.surname)
         view?.findViewById<EditText>(R.id.emailTextView)?.setText(user?.email)
         view?.findViewById<EditText>(R.id.phoneTextView)?.setText(user?.phoneNumber)
-        // view?.findViewById<EditText>(R.id.birthdateTextView)?.setText(user.birthDay.toString())
         view?.findViewById<EditText>(R.id.bioTextView)?.setText(user?.bio)
         view?.findViewById<TextView>(R.id.userRating)?.text = String.format("%.2f", user?.rating)
 

@@ -25,6 +25,7 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.SimpleUserModel
 import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.utility.TimestampManager
 import kotlinx.android.synthetic.main.activity_event_details.*
 import retrofit2.Call
 import retrofit2.Response
@@ -43,19 +44,21 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_event_details)
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
-        EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
+        eventToDisplay = MainActivity.events.find { eventModel -> eventModel.id == eventId } //TODO Change
+        setEvent()
+
+        /*EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
-                getEvent()
+                setEvent()
             }
-        })
+        })*/
     }
 
-    private fun getEvent() {
+    private fun setEvent() {
         popoulateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
-
 
         if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
             joinButton.text = getString(R.string.leave_event)
@@ -108,9 +111,11 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         locationName.text = eventToDisplay?.locationName ?: ""
         eventDescription.text = eventToDisplay?.description ?: ""
         ImageLoader.getInstance()
-                .displayImage(eventToDisplay?.qrCodeLink?.code ?:
-                "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
+                .displayImage(eventToDisplay?.qrCodeLink?.code
+                        ?: "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
                         qrCodeImage)
+        startTime.text = TimestampManager(this).toDateString(eventToDisplay?.startTime ?: 0)
+        endTime.text = TimestampManager(this).toDateString(eventToDisplay?.endTime ?: 0)
 
         getCreator()
 
@@ -136,7 +141,15 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         UsersCalls.getUserById(eventToDisplay?.creator ?: 1, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
-                creatorName.text = "${response?.body()?.name ?: "Error"} ${response?.body()?.surname ?: "Error"}"
+                creatorName.text = "${response?.body()?.name ?: "Error"} ${response?.body()?.surname
+                        ?: "Error"}"
+
+                creatorName.setOnClickListener({
+                    val intent = Intent(this@EventDetailsActivity, UserProfileActivity::class.java)
+                    intent.putExtra(UserProfileActivity.USER_ID, eventToDisplay?.creator ?: 1)
+                    this@EventDetailsActivity.startActivity(intent)
+                })
+
             }
         })
     }
@@ -149,7 +162,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             val currentItem = getItem(position) as SimpleUserModel
-            view?.findViewById<TextView>(R.id.userName)?.text = "$currentItem.firstName ${currentItem.lastName}"
+            view?.findViewById<TextView>(R.id.userName)?.text = "${currentItem.firstName} ${currentItem.lastName}"
 
             view?.setOnClickListener {
                 val intent = Intent(context, UserProfileActivity::class.java)

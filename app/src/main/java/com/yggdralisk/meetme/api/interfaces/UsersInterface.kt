@@ -24,8 +24,8 @@ interface UsersInterface {
     @GET("/api/Users/{id}")
     fun getUserById(@Path("id") id: Int): Call<UserModel>
 
-    @PUT("/api/Users")
-    fun updateMyData(@Body userModel: UserModel): Call<ResponseBody>
+    @PUT("/api/Users/{id}")
+    fun updateMyData(@Body userModel: UserModel, @Path("id") id:Int): Call<ResponseBody>
 
     @POST("/api/Users")
     fun getUsersNameFromIds(@Body ids: List<Int>): Call<List<SimpleUserModel>>
