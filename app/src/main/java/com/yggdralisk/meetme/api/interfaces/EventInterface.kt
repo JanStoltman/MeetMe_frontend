@@ -14,4 +14,7 @@ interface EventInterface {
 
     @GET("/api/Events/{id}")
     fun getEventById(@Path("id") id:Int) : Call<EventModel>
+
+    @GET("api/Events/My")
+    fun getMyEvents() : Call<List<EventModel>>
 }

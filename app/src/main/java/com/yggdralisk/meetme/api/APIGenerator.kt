@@ -36,7 +36,7 @@ class APIGenerator {
                     httpClient.addInterceptor {
                         val original = it.request()
                         val request = original.newBuilder()
-                                .header("Authorization", AccessToken.getCurrentAccessToken().toString())
+                                .header("Authorization", AccessToken.getCurrentAccessToken().token)
                                 .method(original.method(), original.body())
                                 .build()
 

@@ -25,6 +25,7 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.SimpleUserModel
 import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.utility.SharedPreferencesManager
 import kotlinx.android.synthetic.main.activity_event_details.*
 import retrofit2.Call
 import retrofit2.Response
@@ -43,14 +44,22 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_event_details)
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
-        EventCalls.getEventById(eventId, object:MyCallback<EventModel>(this){
-            override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
-                super.onResponse(call, response)
-                eventToDisplay = response?.body()
-                getEvent()
-            }
-        })
+        //TODO uncomment
+//        EventCalls.getEventById(eventId, object:MyCallback<EventModel>(this){
+//            override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+//                super.onResponse(call, response)
+//                eventToDisplay = response?.body()
+//                getEvent()
+//            }
+//        })
 
+
+        //everything down is for mock data
+        val events = SharedPreferencesManager().getEvents(applicationContext)
+        val event = events!!.filter({ it.id == eventId }).first()
+
+        eventToDisplay = event
+        getEvent()
 
     }
 
@@ -87,22 +96,42 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getGuests() {
-        UsersCalls.getNamesForIds(eventToDisplay?.guests!!, object:MyCallback<List<SimpleUserModel>>(this){
-            override fun onResponse(call: Call<List<SimpleUserModel>>?, response: Response<List<SimpleUserModel>>?) {
-                super.onResponse(call, response)
-                eventGuests.addAll(response?.body() ?: listOf())
-                (guestsList?.adapter as MyAdapter).notifyDataSetChanged()
-            }
-        })
+        //TODO uncomment
+//        UsersCalls.getNamesForIds(eventToDisplay?.guests!!, object:MyCallback<List<SimpleUserModel>>(this){
+//            override fun onResponse(call: Call<List<SimpleUserModel>>?, response: Response<List<SimpleUserModel>>?) {
+//                super.onResponse(call, response)
+//                eventGuests.addAll(response?.body() ?: listOf())
+//                (guestsList?.adapter as MyAdapter).notifyDataSetChanged()
+//            }
+//        })
+
+        //MOCK
+        val guestIDs = eventToDisplay?.guests!!
+        val users = SharedPreferencesManager().getUsers(applicationContext)!!
+        val eventUsers = users.filter { guestIDs.contains(it.id) }
+        val eventSimpleUsers = ArrayList<SimpleUserModel>()
+        for(user in eventUsers){
+            eventSimpleUsers.add(SimpleUserModel(user.id!!, user.name!!, user.surname!!))
+        }
+
+        eventGuests = eventSimpleUsers
+        (guestsList?.adapter as MyAdapter).notifyDataSetChanged()
     }
 
     private fun getCreator() {
-        UsersCalls.getUserById(eventToDisplay?.creator!!, object: MyCallback<UserModel>(this){
-            override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
-                super.onResponse(call, response)
-                creatorName.text = response?.body()?.name ?: "Error"
-            }
-        })
+        //TODO uncomment
+//        UsersCalls.getUserById(eventToDisplay?.creator!!, object: MyCallback<UserModel>(this){
+//            override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
+//                super.onResponse(call, response)
+//                creatorName.text = response?.body()?.name ?: "Error"
+//            }
+//        })
+
+        val creatorID = eventToDisplay?.creator!!
+        val users = SharedPreferencesManager().getUsers(applicationContext)!!
+        val eventCreator = users.filter { it.id == creatorID }.first()
+
+        creatorName.text = eventCreator.name
     }
 
     class MyAdapter(val guests: List<SimpleUserModel>, val context: Context) : BaseAdapter() {

@@ -17,7 +17,9 @@ import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.utility.FBProfileDataHelper
 import kotlinx.android.synthetic.main.activity_login_main.*
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
 
@@ -29,14 +31,15 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val callbackManager = CallbackManager.Factory.create()
+    private var facebookJSONData : JSONObject? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_main)
         loginButton.setReadPermissions(listOf(EMAIL))
 
-        if (checkToken()) {
-            askForPermissions()
+        if (checkFacebookToken()) {
+            getId()
         } else {
             setupLoginBUtton()
         }
@@ -52,7 +55,19 @@ class LoginActivity : AppCompatActivity() {
             override fun onSuccess(result: LoginResult?) {
                 loginButton.visibility = View.INVISIBLE
                 loadingSpinner.visibility = View.VISIBLE
-                registerUser()
+
+                //getting user profile data
+                val request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken()) { jsonObject, response ->
+                    facebookJSONData = jsonObject
+
+                    //to tutaj żeby wykonywało się po ściągnięciu danych usera
+                    registerUser()
+                }
+
+                val parameters = Bundle()
+                parameters.putString("fields", "id,first_name,last_name,email")
+                request.parameters = parameters
+                request.executeAsync()
             }
 
             override fun onCancel() {
@@ -77,23 +92,29 @@ class LoginActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
         } else {
-            getId()
-            proceedToMap()
+            proceedToMapOrDataFill()
         }
     }
 
-    private fun proceedToMap() {
-        startActivity(Intent(applicationContext, MainActivity::class.java))
+    private fun proceedToMapOrDataFill() {
+        val user = MyApplication.currentUser
+
+        if(facebookJSONData != null && (user?.name == null || user?.surname == null || user?.email == null)){
+            startUserDataFillActivity()
+        }
+        else{
+            startActivity(Intent(applicationContext, MainActivity::class.java))
+        }
+
     }
 
     private fun registerUser() {
         if (AccessToken.getCurrentAccessToken() != null) {
-            Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().token}", Toast.LENGTH_LONG).show()
+            //Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().token}", Toast.LENGTH_LONG).show()
             UsersCalls.registerUser(hashMapOf(Pair("Token", AccessToken.getCurrentAccessToken().token)),
                     object : MyCallback<Int>(this) {
                         override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
                             super.onResponse(call, response)
-                            MyApplication.userId = response?.body() ?: 0
                             getId()
                         }
                     })
@@ -104,18 +125,30 @@ class LoginActivity : AppCompatActivity() {
         UsersCalls.getMyId(object : MyCallback<Int>(this) {
             override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
                 super.onResponse(call, response)
-                MyApplication.userId = response?.body() ?: 0
-                getUser(MyApplication.userId)
+                if(response?.isSuccessful == false){
+                    registerUser()
+                }else {
+                    MyApplication.userId = response?.body() ?: 0
+                    getUser(MyApplication.userId)
+                }
             }
         })
     }
 
-    private fun getUser(id: Int){
+
+    private fun startUserDataFillActivity() {
+        val intent = Intent(this, UserDataFillActivity::class.java)
+        val facebookDataBundle = FBProfileDataHelper.jsonToBundle(facebookJSONData!!)
+        intent.putExtras(facebookDataBundle)
+        startActivity(intent)
+    }
+
+    private fun getUser(id: Int) {
         UsersCalls.getUserById(id, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
                 MyApplication.currentUser = response?.body()
-                proceedToMap()
+                askForPermissions()
             }
         })
     }
@@ -127,14 +160,14 @@ class LoginActivity : AppCompatActivity() {
      *
      * @return true if there is a user logged in and token is still valid, false otherwise
      */
-    private fun checkToken(): Boolean {
+    private fun checkFacebookToken(): Boolean {
         return AccessToken.getCurrentAccessToken() != null
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-                proceedToMap()
+                proceedToMapOrDataFill()
                 return
             }
 

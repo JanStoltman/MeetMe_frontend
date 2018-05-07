@@ -90,7 +90,7 @@ class SharedPreferencesManager {
         context ?: return null
 
         val sharedPref = getSharedPref(context)
-        val json = sharedPref.getString(context.getString(R.string.token_pref_key), null)
+        val json = sharedPref.getString(context.getString(R.string.events_store_key), null)
         return if (json == null || json.isEmpty()) null else Gson().fromJson(json, object : TypeToken<List<EventModel>>() {}.type)
     }
 }

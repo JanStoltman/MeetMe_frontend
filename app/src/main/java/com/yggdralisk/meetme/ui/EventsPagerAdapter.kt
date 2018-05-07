@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.fragments.EventsListFragment
+import com.yggdralisk.meetme.ui.fragments.MyEventsListFragment
 import com.yggdralisk.meetme.ui.fragments.UserProfileFragment
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
 import java.lang.ref.WeakReference
@@ -39,7 +40,8 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
 
         var googleMapRef: WeakReference<GoogleMap>? = null
         var eventsListFragmentRef: WeakReference<EventsListFragment>? = null
-        var userProfileFragmentRef: WeakReference<UserProfileFragment>? = null
+        var myEventsListFragmentRef: WeakReference<MyEventsListFragment>? = null
+//        var userProfileFragmentRef: WeakReference<UserProfileFragment>? = null
     }
 
     override fun getItem(position: Int): Fragment {
@@ -67,12 +69,12 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
 
                     if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                             == PackageManager.PERMISSION_GRANTED) {
-                        googleMap.isMyLocationEnabled = true //TODO: move camera to user's location
+                        googleMap.isMyLocationEnabled = true
 
-                        val sydney = LatLng(51.108081, 17.065134)//TODO: Change this when ^that one is done
+                        val sydney = LatLng(51.108081, 17.065134)
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
                     } else {
-                        val sydney = LatLng(51.108081, 17.065134)//TODO: handle lack of permission
+                        val sydney = LatLng(51.108081, 17.065134)
                         googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
                     }
                 }
@@ -84,9 +86,9 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
                 eventsListFragmentRef?.get()!!
             } //Events list
             2 -> {
-                userProfileFragmentRef = WeakReference(UserProfileFragment.newInstance())
-                userProfileFragmentRef?.get()!!
-            } //UserModel profile
+                myEventsListFragmentRef = WeakReference(MyEventsListFragment.newInstance(provider))
+                myEventsListFragmentRef?.get()!!
+            } //MyEvents list
             else -> throw IndexOutOfBoundsException(position.toString() + " :View pager position not found")
         }
     }
@@ -124,6 +126,10 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val 
 
         if (eventsListFragmentRef != null && eventsListFragmentRef!!.get() != null) {
             eventsListFragmentRef?.get()?.refreshEvents()
+        }
+
+        if (myEventsListFragmentRef != null && myEventsListFragmentRef!!.get() != null) {
+            myEventsListFragmentRef?.get()?.refreshEvents()
         }
     }
 
