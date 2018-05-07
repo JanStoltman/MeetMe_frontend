@@ -4,6 +4,160 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.yggdralisk.meetme.ui.activities.AddEventActivity">
+    tools:context="com.yggdralisk.meetme.ui.activities.AddEventActivity"
+    tools:layout_editor_absoluteY="81dp">
+
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:text="Create"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <EditText
+        android:id="@+id/guestLimit"
+        android:layout_width="wrap_content"
+        android:hint="Guests limit"
+        android:inputType="number"
+        android:maxLines="1"
+        android:maxLength="3"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/descriptionEdit" />
+
+    <EditText
+        android:id="@+id/minAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:hint="Min age"
+        android:inputType="number"
+        android:maxLength="3"
+        android:maxLines="1"
+        app:layout_constraintStart_toStartOf="@+id/locationNameEdit"
+        app:layout_constraintTop_toBottomOf="@+id/descriptionEdit" />
+
+    <EditText
+        android:id="@+id/maxAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:hint="Max age"
+        android:inputType="number"
+        android:maxLines="1"
+        android:maxLength="3"
+        android:layout_marginStart="8dp"
+        app:layout_constraintStart_toEndOf="@+id/minAge"
+        app:layout_constraintTop_toTopOf="@+id/minAge" />
+
+    <ToggleButton
+        android:id="@+id/privateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textOff="Public"
+        android:textOn="Private"
+        app:layout_constraintStart_toEndOf="@+id/timeButton"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
+
+    <EditText
+        android:id="@+id/eventNameEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Event name"
+        android:inputType="textPersonName"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/locationNameEdit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:hint="Location name"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/minAge" />
+
+    <ImageButton
+        android:id="@+id/calendarButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_date_picker"
+        app:layout_constraintBottom_toBottomOf="@+id/privateButton"
+        app:layout_constraintStart_toEndOf="@+id/googleMapsButton" />
+
+    <ImageButton
+        android:id="@+id/timeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_clock"
+        app:layout_constraintBottom_toBottomOf="@+id/privateButton"
+        app:layout_constraintStart_toEndOf="@+id/calendarButton" />
+
+    <ImageButton
+        android:id="@+id/calendarButtonEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_date_picker"
+        app:layout_constraintStart_toStartOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <ImageButton
+        android:id="@+id/timeButtonEnd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:src="@drawable/ic_clock"
+        app:layout_constraintStart_toEndOf="@+id/calendarButtonEnd"
+        app:layout_constraintTop_toTopOf="@+id/calendarButtonEnd" />
+
+    <ImageButton
+        android:id="@+id/googleMapsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_map"
+        app:layout_constraintBottom_toBottomOf="@+id/calendarButton"
+        app:layout_constraintStart_toStartOf="@+id/locationNameEdit" />
+
+    <EditText
+        android:id="@+id/descriptionEdit"
+        android:layout_width="368dp"
+        android:layout_height="132dp"
+        android:layout_marginStart="8dp"
+        android:hint="Description"
+        android:inputType="text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/eventNameEdit" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="End time"
+        app:layout_constraintStart_toStartOf="@+id/calendarButton"
+        app:layout_constraintTop_toBottomOf="@+id/calendarButton" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="Start time"
+        app:layout_constraintStart_toStartOf="@+id/calendarButton"
+        app:layout_constraintTop_toBottomOf="@+id/locationNameEdit" />
 
 </android.support.constraint.ConstraintLayout>

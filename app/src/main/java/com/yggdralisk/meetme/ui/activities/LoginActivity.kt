@@ -38,6 +38,8 @@ class LoginActivity : AppCompatActivity() {
         if (checkFacebookToken()) {
             getId()
         } else {
+            loginButton.visibility = View.VISIBLE
+            loadingSpinner.visibility = View.INVISIBLE
             setupLoginBUtton()
         }
 
@@ -83,6 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun proceedToMap() {
         startActivity(Intent(applicationContext, MainActivity::class.java))
+        this.finish()
     }
 
     private fun registerUser() {

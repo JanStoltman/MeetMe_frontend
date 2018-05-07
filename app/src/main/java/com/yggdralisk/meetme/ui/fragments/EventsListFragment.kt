@@ -28,11 +28,11 @@ class EventsListFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View? = inflater?.inflate(R.layout.events_list_frgment, container, false)
         val recyclerView: RecyclerView? = view?.findViewById(R.id.recyclerView)
         recyclerView?.layoutManager = LinearLayoutManager(context)
-        recyclerView?.adapter = EventsAdapter(context)
+        recyclerView?.adapter = EventsAdapter(context!!)
 
         return view
     }
@@ -41,14 +41,14 @@ class EventsListFragment : Fragment() {
         : RecyclerView.Adapter<EventsAdapter.ViewHolder>() {
         class ViewHolder(val rowView: View) : RecyclerView.ViewHolder(rowView)
 
-        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val rowView: View = LayoutInflater.from(parent?.context)
                     .inflate(R.layout.recycler_row, parent, false)
 
             return ViewHolder(rowView)
         }
 
-        override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val event = provider?.getEvents()?.get(position)
             holder?.rowView?.findViewById<TextView>(R.id.eventName)?.text = event?.name
             holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size, event?.guestLimit)

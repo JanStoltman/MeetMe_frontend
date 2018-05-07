@@ -30,7 +30,7 @@ class UserProfileFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view: View? = inflater?.inflate(R.layout.user_profile_fragment, container, false)
         readUserData(view)
         view?.findViewById<Button>(R.id.logoutButton)?.setOnClickListener({
@@ -41,14 +41,14 @@ class UserProfileFragment : Fragment() {
 
     private fun disconnectFromFacebook() {
         if (AccessToken.getCurrentAccessToken() == null) {
-            this.activity.finish()
+            this.activity?.finish()
             return // already logged out
         }
 
         GraphRequest(AccessToken.getCurrentAccessToken(), "/me/permissions/", null,
                 HttpMethod.DELETE, GraphRequest.Callback {
             LoginManager.getInstance().logOut()
-            this.activity.finish()
+            this.activity?.finish()
         }).executeAsync()
     }
 
@@ -62,7 +62,7 @@ class UserProfileFragment : Fragment() {
             //user.birthDay = view?.findViewById<EditText>(R.id.birthdateTextView)?.text.toString().toLong()
             user?.bio = view?.findViewById<EditText>(R.id.bioTextView)?.text.toString()
 
-            UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(context) {
+            UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(context!!) {
                 override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                     super.onResponse(call, response)
                     Toast.makeText(context, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
