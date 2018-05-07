@@ -44,16 +44,14 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_event_details)
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
-        eventToDisplay = MainActivity.events.find { eventModel -> eventModel.id == eventId } //TODO Change
-        setEvent()
 
-        /*EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
+        EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
                 setEvent()
             }
-        })*/
+        })
     }
 
     private fun setEvent() {
@@ -114,8 +112,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 .displayImage(eventToDisplay?.qrCodeLink?.code
                         ?: "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
                         qrCodeImage)
-        startTime.text = TimestampManager(this).toDateString(eventToDisplay?.startTime ?: 0)
-        endTime.text = TimestampManager(this).toDateString(eventToDisplay?.endTime ?: 0)
+        startTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.startTime ?: 0)
+        endTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.endTime ?: 0)
 
         getCreator()
 
