@@ -16,11 +16,16 @@ import com.google.android.gms.location.places.Place
 import com.google.android.gms.location.places.ui.PlacePicker
 import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
+import com.yggdralisk.meetme.api.MyCallback
+import com.yggdralisk.meetme.api.calls.EventCalls
 import com.yggdralisk.meetme.api.models.AgeRestriction
 import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.EventType
+import com.yggdralisk.meetme.api.models.QrCode
 import com.yggdralisk.meetme.utility.TimestampManager
 import kotlinx.android.synthetic.main.activity_add_event.*
+import retrofit2.Call
+import retrofit2.Response
 import java.util.*
 
 
@@ -95,16 +100,22 @@ class AddEventActivity : AppCompatActivity() {
                 googleMapsURL = choosenPlace?.address?.toString() ?: "",
                 latitude = choosenPlace?.latLng?.latitude ?: 0.0,
                 longitude = choosenPlace?.latLng?.longitude ?: 0.0,
-                id = null,
-                qrCodeLink = null,
+                id = 0,
+                qrCodeLink = QrCode(""),
                 name = eventNameEdit.text.toString(),
                 locationName = choosenPlace?.name?.toString() ?: "",
                 timeCreated = System.currentTimeMillis()/1000,
                 endTime = TimestampManager(baseContext).dateToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute"),
                 startTime = TimestampManager(baseContext).dateToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"))
 
-        event.name = eventNameEdit.text.toString()
-
+        EventCalls.postEvent(event, object: MyCallback<EventModel>(this){
+            override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                super.onResponse(call, response)
+                if(response?.isSuccessful == true){
+                    this@AddEventActivity.finish()
+                }
+            }
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

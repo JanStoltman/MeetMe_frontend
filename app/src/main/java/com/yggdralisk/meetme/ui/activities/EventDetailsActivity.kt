@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.ListAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -17,6 +16,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.nostra13.universalimageloader.core.ImageLoader
 import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
@@ -43,30 +43,59 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_event_details)
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
-        EventCalls.getEventById(eventId, object:MyCallback<EventModel>(this){
+        EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
                 getEvent()
             }
         })
-
-
     }
 
     private fun getEvent() {
         popoulateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
 
-        if (eventToDisplay?.guestLimit!! <= eventToDisplay?.guests?.size!!) joinButton.text = this.getText(R.string.event_full)
 
-        joinButton.setOnClickListener({ Toast.makeText(this, "Empty stub", Toast.LENGTH_SHORT).show() }) //TODO: add join events
+        if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
+            joinButton.text = getString(R.string.leave_event)
+
+            joinButton.setOnClickListener({
+                eventToDisplay?.let {
+                    EventCalls.joinEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                            super.onResponse(call, response)
+                            if (response?.isSuccessful == true) {
+                                Toast.makeText(baseContext, "Event left empty stub", Toast.LENGTH_LONG).show()
+                            }
+                        }
+                    })
+                }
+            })
+        } else if (eventToDisplay?.guestLimit ?: 4 <= eventToDisplay?.guests?.size ?: 1) {
+            joinButton.text = this.getText(R.string.event_full)
+        } else {
+            joinButton.setOnClickListener({
+                eventToDisplay?.let {
+                    EventCalls.joinEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                            super.onResponse(call, response)
+                            if (response?.isSuccessful == true) {
+                                Toast.makeText(baseContext, "Event joined", Toast.LENGTH_LONG).show()
+                                this@EventDetailsActivity.finish()
+                            }
+                        }
+                    })
+                }
+            })
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap?) {
         googleMap?.setMinZoomPreference(14f)
 
-        val pos = LatLng(eventToDisplay?.latitude!!, eventToDisplay?.longitude!!)//TODO: handle lack of permission
+        val pos = LatLng(eventToDisplay?.latitude ?: 51.108081, eventToDisplay?.longitude
+                ?: 17.065134)//TODO: handle lack of permission
         val marker: MarkerOptions = MarkerOptions()
                 .position(pos)
 
@@ -75,7 +104,13 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun popoulateUI() {
-        eventName.text = eventToDisplay?.name ?: "Error"
+        eventName.text = eventToDisplay?.name ?: ""
+        locationName.text = eventToDisplay?.locationName ?: ""
+        eventDescription.text = eventToDisplay?.description ?: ""
+        ImageLoader.getInstance()
+                .displayImage(eventToDisplay?.qrCodeLink?.code ?:
+                "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
+                        qrCodeImage)
 
         getCreator()
 
@@ -87,7 +122,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getGuests() {
-        UsersCalls.getNamesForIds(eventToDisplay?.guests!!, object:MyCallback<List<SimpleUserModel>>(this){
+        UsersCalls.getNamesForIds(eventToDisplay?.guests
+                ?: listOf(), object : MyCallback<List<SimpleUserModel>>(this) {
             override fun onResponse(call: Call<List<SimpleUserModel>>?, response: Response<List<SimpleUserModel>>?) {
                 super.onResponse(call, response)
                 eventGuests.addAll(response?.body() ?: listOf())
@@ -97,16 +133,16 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun getCreator() {
-        UsersCalls.getUserById(eventToDisplay?.creator!!, object: MyCallback<UserModel>(this){
+        UsersCalls.getUserById(eventToDisplay?.creator ?: 1, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
-                creatorName.text = response?.body()?.name ?: "Error"
+                creatorName.text = "${response?.body()?.name ?: "Error"} ${response?.body()?.surname ?: "Error"}"
             }
         })
     }
 
     class MyAdapter(val guests: List<SimpleUserModel>, val context: Context) : BaseAdapter() {
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
             var view = convertView
             if (view == null) {
                 view = LayoutInflater.from(context).inflate(R.layout.guest_list_element, parent, false)
@@ -120,7 +156,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 intent.putExtra(UserProfileActivity.USER_ID, currentItem.id)
                 context.startActivity(intent)
             }
-            return view!!
+
+            return view
         }
 
         override fun getItem(position: Int): Any? = guests[position]
@@ -128,7 +165,5 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         override fun getItemId(position: Int): Long = guests[position].id.toLong()
 
         override fun getCount(): Int = guests.size
-
     }
-
 }

@@ -20,6 +20,12 @@ import com.yggdralisk.meetme.api.models.UserModel
 import kotlinx.android.synthetic.main.activity_login_main.*
 import retrofit2.Call
 import retrofit2.Response
+import android.provider.SyncStateContract.Helpers.update
+import android.content.pm.PackageInfo
+import android.util.Base64
+import android.util.Log
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 
 class LoginActivity : AppCompatActivity() {
@@ -54,7 +60,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onSuccess(result: LoginResult?) {
                 loginButton.visibility = View.INVISIBLE
                 loadingSpinner.visibility = View.VISIBLE
-                registerUser()
+                getId()
             }
 
             override fun onCancel() {
@@ -90,8 +96,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun registerUser() {
         if (AccessToken.getCurrentAccessToken() != null) {
-            Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().token}", Toast.LENGTH_LONG).show()
-            UsersCalls.registerUser(hashMapOf(Pair("Token", AccessToken.getCurrentAccessToken().token)),
+            Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().userId}", Toast.LENGTH_LONG).show()
+            UsersCalls.registerUser(hashMapOf(Pair("Token", AccessToken.getCurrentAccessToken().userId)),
                     object : MyCallback<Int>(this) {
                         override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
                             super.onResponse(call, response)

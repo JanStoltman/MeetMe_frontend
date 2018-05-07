@@ -2,7 +2,9 @@ package com.yggdralisk.meetme.api.interfaces
 
 import com.yggdralisk.meetme.api.models.EventModel
 import retrofit2.Call
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 
 /**
@@ -10,8 +12,14 @@ import retrofit2.http.Path
  */
 interface EventInterface {
     @GET("/api/Events")
-    fun getEvents() : Call<List<EventModel>>
+    fun getEvents(): Call<List<EventModel>>
 
     @GET("/api/Events/{id}")
-    fun getEventById(@Path("id") id:Int) : Call<EventModel>
+    fun getEventById(@Path("id") id: Int): Call<EventModel>
+
+    @POST("/api/Events")
+    fun postEvent(@Body event: EventModel): Call<EventModel>
+
+    @POST("/api/Events/{id}/Join")
+    fun joinEvent(@Path("id") id: Int): Call<EventModel>
 }

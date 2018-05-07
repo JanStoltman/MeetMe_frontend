@@ -11,7 +11,7 @@ data class EventModel(
         @SerializedName("StartTime") var startTime: Long?,
         @SerializedName("EndTime") var endTime: Long?,
         @SerializedName("QrCode") var qrCodeLink: QrCode?,
-        @SerializedName("Name") var name: String?,
+        @SerializedName("EventName") var name: String?,
         @SerializedName("GuestsIds") var guests: List<Int>?,
         @SerializedName("CreatorId") var creator: Int?,
         @SerializedName("GuestLimit") var guestLimit: Int?,
