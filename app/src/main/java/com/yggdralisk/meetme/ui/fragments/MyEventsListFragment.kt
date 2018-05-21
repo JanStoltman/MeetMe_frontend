@@ -4,15 +4,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity.Companion.EVENT_ID
+import com.yggdralisk.meetme.ui.activities.UserDataFillActivity
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
 import kotlinx.android.synthetic.main.events_list_frgment.*
 
@@ -29,10 +32,21 @@ class MyEventsListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View? = inflater?.inflate(R.layout.events_list_frgment, container, false)
+        val view: View? = inflater?.inflate(R.layout.my_events_list_fragment, container, false)
         val recyclerView: RecyclerView? = view?.findViewById(R.id.recyclerView)
         recyclerView?.layoutManager = LinearLayoutManager(context)
         recyclerView?.adapter = EventsAdapter(context!!)
+
+        view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)?.setOnRefreshListener {
+            provider?.callEvents()
+            view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout).isRefreshing = false
+        }
+
+        view?.findViewById<ImageButton>(R.id.profileButton)?.setOnClickListener({
+            val intent = Intent(context, UserDataFillActivity::class.java)
+            intent.putExtras(Bundle.EMPTY)
+            startActivity(intent)
+        })
 
         return view
     }

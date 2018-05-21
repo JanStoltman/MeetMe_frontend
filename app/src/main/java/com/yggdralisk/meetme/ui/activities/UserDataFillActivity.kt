@@ -1,13 +1,8 @@
 package com.yggdralisk.meetme.ui.activities
 
-import android.app.DatePickerDialog
-import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.view.View
 import android.widget.*
 import com.facebook.AccessToken
 import com.facebook.GraphRequest
@@ -18,21 +13,11 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.UsersCalls
-import com.yggdralisk.meetme.api.models.UserModel
-import com.yggdralisk.meetme.utility.FBProfileDataHelper
 import okhttp3.ResponseBody
-import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Response
-import java.util.*
 
 class UserDataFillActivity : AppCompatActivity() {
-
-    companion object {
-        var chosenYear: String = ""
-        var chosenMonth: String = ""
-        var chosenDay: String = ""
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -83,7 +68,11 @@ class UserDataFillActivity : AppCompatActivity() {
         findViewById<EditText>(R.id.phoneTextView)?.setText(user?.phoneNumber)
         //findViewById<EditText>(R.id.birthdateTextView)?.setText(user.birthDay.toString())
         findViewById<EditText>(R.id.bioTextView)?.setText(user?.bio)
-        findViewById<TextView>(R.id.userRating)?.setText(String.format("%.2f", user?.rating))
+        var ratingString = "-,--"
+        if(user?.rating != 6.0){
+            ratingString = String.format("%.2f", user?.rating)
+        }
+        findViewById<TextView>(R.id.userRating)?.setText(ratingString)
     }
 
     private fun saveUserData() {

@@ -37,8 +37,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="parent">
 
             <android.support.design.widget.TextInputEditText
@@ -57,8 +59,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toBottomOf="@+id/nameLayout">
 
             <android.support.design.widget.TextInputEditText
@@ -76,16 +80,18 @@
         <android.support.design.widget.TextInputLayout
             android:id="@+id/emailLayout"
 
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView">
 
             <android.support.design.widget.TextInputEditText
                 android:id="@+id/emailTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
@@ -171,15 +177,15 @@
             android:layout_width="116dp"
             android:layout_height="57dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="8dp"
             android:ems="10"
             android:gravity="center"
             android:text="@string/zero_rating"
             android:textSize="25sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.448"
+            app:layout_constraintHorizontal_bias="0.603"
             app:layout_constraintStart_toEndOf="@+id/phoneLayout"
-            app:layout_constraintTop_toBottomOf="@+id/surnameLayout" />
+            app:layout_constraintTop_toBottomOf="@+id/ratingLabel" />
 
         <Button
             android:id="@+id/logoutButton"
@@ -194,5 +200,17 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/saveButton" />
+
+        <TextView
+            android:id="@+id/ratingLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Rating"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/phoneLayout"
+            app:layout_constraintTop_toBottomOf="@+id/emailLayout" />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -30,4 +30,5 @@
     <string name="logout">Logout</string>
     <string name="leave_event">Leave event</string>
     <string name="your_event">It\'s your event!</string>
+    <string name="profile">profile</string>
 </resources>
