@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -29,10 +30,15 @@ class EventsListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view: View? = inflater?.inflate(R.layout.events_list_frgment, container, false)
+        val view: View? = inflater.inflate(R.layout.events_list_frgment, container, false)
         val recyclerView: RecyclerView? = view?.findViewById(R.id.recyclerView)
         recyclerView?.layoutManager = LinearLayoutManager(context)
         recyclerView?.adapter = EventsAdapter(context!!)
+
+        view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)?.setOnRefreshListener {
+            provider?.callEvents()
+            view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout).isRefreshing = false
+        }
 
         return view
     }
@@ -50,18 +56,18 @@ class EventsListFragment : Fragment() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val event = provider?.getEvents()?.get(position)
-            holder?.rowView?.findViewById<TextView>(R.id.eventName)?.text = event?.name
-            holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size, event?.guestLimit)
+            holder.rowView.findViewById<TextView>(R.id.eventName)?.text = event?.name
+            holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size, event?.guestLimit)
 
             if (event?.guestLimit == null || event.guests == null || event.guestLimit!! > event.guests!!.size) {
-                holder?.rowView?.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
+                holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
             }
 
 /*            val creator: UserModel = MockApplication.mockUsers.filter { user -> user.id == event?.creator }[0]
             holder?.rowView?.findViewById<TextView>(R.id.creatorName)?.text = String.format("%s %s", creator.name, creator.surname)
             holder?.rowView?.findViewById<TextView>(R.id.creatorScore)?.text = String.format("%.2f", creator.rating)*/
 
-            holder?.rowView?.setOnClickListener({
+            holder.rowView.setOnClickListener({
                 val intent = Intent(context, EventDetailsActivity::class.java)
                 intent.putExtra(EVENT_ID, event?.id)
                 context.startActivity(intent)

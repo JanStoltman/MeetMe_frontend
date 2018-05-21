@@ -3,7 +3,6 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.EventCalls
@@ -38,13 +37,18 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         })
     }
 
+    override fun onResume() {
+        super.onResume()
+        callEvents()
+    }
+
     private fun startAddEventActivity() {
         val intent = Intent(this, AddEventActivity::class.java)
 
         startActivity(intent)
     }
 
-    private fun callEvents() {
+    override fun callEvents() {
         EventCalls.getEvents(object : MyCallback<List<EventModel>>(this) {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
                 if (response != null && response.isSuccessful && response.body() != null) {

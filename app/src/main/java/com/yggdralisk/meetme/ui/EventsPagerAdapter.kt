@@ -24,7 +24,7 @@ import java.lang.ref.WeakReference
 /**
  * Created by Jan Stoltman on 4/16/18.
  */
-class EventsPagerAdapter(fm: FragmentManager, private val context: Context, val provider: EventsListProviderInterface) : FragmentPagerAdapter(fm) {
+class EventsPagerAdapter(fm: FragmentManager, private val context: Context, private val provider: EventsListProviderInterface) : FragmentPagerAdapter(fm) {
     companion object {
         const val PAGES_COUNT = 3 //Map, List, UserPage
         const val ONE_SECOND_MILIS: Long = 2000L

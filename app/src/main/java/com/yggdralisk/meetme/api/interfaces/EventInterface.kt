@@ -22,4 +22,7 @@ interface EventInterface {
 
     @POST("/api/Events/{id}/Join")
     fun joinEvent(@Path("id") id: Int): Call<EventModel>
+
+    @POST("/api/Events/{id}/Leave")
+    fun leaveEvent(@Path("id") id: Int): Call<EventModel>
 }
