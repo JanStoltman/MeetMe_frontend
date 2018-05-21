@@ -63,7 +63,7 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         })
     }
 
-    private fun callMyEvents() {
+    override fun callMyEvents() {
         EventCalls.getMyEvents(object : MyCallback<List<EventModel>>(this) {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
                 if (response != null && response.isSuccessful && response.body() != null) {

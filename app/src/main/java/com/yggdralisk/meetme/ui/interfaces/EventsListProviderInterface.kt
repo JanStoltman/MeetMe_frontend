@@ -11,4 +11,5 @@ interface EventsListProviderInterface {
     fun getMyEvents(): ArrayList<EventModel>
 
     fun callEvents()
+    fun callMyEvents()
 }

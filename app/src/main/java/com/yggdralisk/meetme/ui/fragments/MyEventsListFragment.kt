@@ -38,7 +38,7 @@ class MyEventsListFragment : Fragment() {
         recyclerView?.adapter = EventsAdapter(context!!)
 
         view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)?.setOnRefreshListener {
-            provider?.callEvents()
+            provider?.callMyEvents()
             view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout).isRefreshing = false
         }
 
