@@ -31,7 +31,7 @@ import java.util.*
 
 class AddEventActivity : AppCompatActivity() {
     companion object {
-        val PLACE_PICKER_REQUEST = 1
+        const val PLACE_PICKER_REQUEST = 1
 
         private var choosenPlace: Place? = null
         var chosenMinute: String = ""
@@ -106,7 +106,8 @@ class AddEventActivity : AppCompatActivity() {
                 locationName = choosenPlace?.name?.toString() ?: "",
                 timeCreated = System.currentTimeMillis()/1000,
                 endTime = TimestampManager(baseContext).dateToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute"),
-                startTime = TimestampManager(baseContext).dateToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"))
+                startTime = TimestampManager(baseContext).dateToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"),
+                address = choosenPlace?.address?.toString())
 
         EventCalls.postEvent(event, object: MyCallback<EventModel>(this){
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {

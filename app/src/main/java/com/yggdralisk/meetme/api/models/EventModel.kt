@@ -21,5 +21,6 @@ data class EventModel(
         @SerializedName("Longitude") var longitude: Double?,
         @SerializedName("LocationName") var locationName: String?,
         @SerializedName("Description") var description: String?,
-        @SerializedName("GoogleMapsURL") var googleMapsURL: String?
+        @SerializedName("GoogleMapsURL") var googleMapsURL: String?,
+        @SerializedName("Address") var address: String?
 )

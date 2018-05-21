@@ -63,11 +63,12 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             joinButton.setOnClickListener({
                 eventToDisplay?.let {
-                    EventCalls.joinEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                    EventCalls.leaveEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
                         override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                             super.onResponse(call, response)
                             if (response?.isSuccessful == true) {
-                                Toast.makeText(baseContext, "Event left empty stub", Toast.LENGTH_LONG).show()
+                                Toast.makeText(baseContext, "Event left", Toast.LENGTH_LONG).show()
+                                this@EventDetailsActivity.finish()
                             }
                         }
                     })
@@ -114,6 +115,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                         qrCodeImage)
         startTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.startTime ?: 0)
         endTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.endTime ?: 0)
+        locationAddress.text = eventToDisplay?.address ?: ""
 
         getCreator()
 
