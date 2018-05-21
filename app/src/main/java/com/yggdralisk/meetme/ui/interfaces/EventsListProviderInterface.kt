@@ -7,4 +7,5 @@ import com.yggdralisk.meetme.api.models.EventModel
  */
 interface EventsListProviderInterface {
     fun getEvents(): ArrayList<EventModel>
+    fun getMyEvents(): ArrayList<EventModel>
 }

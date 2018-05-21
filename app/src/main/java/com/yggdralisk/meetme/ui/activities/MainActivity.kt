@@ -17,6 +17,7 @@ import retrofit2.Response
 class MainActivity : FragmentActivity(), EventsListProviderInterface {
     companion object {
         val events: ArrayList<EventModel> = ArrayList()
+        val myEvents: ArrayList<EventModel> = ArrayList()
     }
 
     var pagerAdapter: EventsPagerAdapter? = null
@@ -31,7 +32,9 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         viewPager.offscreenPageLimit = 2
         tabLayout.setupWithViewPager(viewPager)
         setupTabIcons()
+
         callEvents()
+        callMyEvents()
 
         addEventButton.setOnClickListener({
             startAddEventActivity()
@@ -56,8 +59,24 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         })
     }
 
+    private fun callMyEvents() {
+        EventCalls.getMyEvents(object : MyCallback<List<EventModel>>(this) {
+            override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
+                if (response != null && response.isSuccessful && response.body() != null) {
+                    myEvents.clear()
+                    myEvents.addAll(response.body() as List<EventModel>)
+                    pagerAdapter?.refreshEvents()
+                }
+            }
+        })
+    }
+
     override fun getEvents(): ArrayList<EventModel> {
         return events
+    }
+
+    override fun getMyEvents(): ArrayList<EventModel> {
+        return myEvents
     }
 
     private fun setupTabIcons() {

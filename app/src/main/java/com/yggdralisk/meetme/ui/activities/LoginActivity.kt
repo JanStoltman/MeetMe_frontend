@@ -24,6 +24,8 @@ import android.provider.SyncStateContract.Helpers.update
 import android.content.pm.PackageInfo
 import android.util.Base64
 import android.util.Log
+import com.yggdralisk.meetme.utility.FBProfileDataHelper
+import org.json.JSONObject
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
 
@@ -35,6 +37,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val callbackManager = CallbackManager.Factory.create()
+    private var facebookJSONData : JSONObject? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,8 +47,6 @@ class LoginActivity : AppCompatActivity() {
         if (checkFacebookToken()) {
             getId()
         } else {
-            loginButton.visibility = View.VISIBLE
-            loadingSpinner.visibility = View.INVISIBLE
             setupLoginBUtton()
         }
 
@@ -54,13 +55,27 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupLoginBUtton() {
+        loginButton.visibility = View.VISIBLE
+        loadingSpinner.visibility = View.INVISIBLE
         loginButton.setReadPermissions(listOf(
                 "public_profile", "email"))
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
                 loginButton.visibility = View.INVISIBLE
                 loadingSpinner.visibility = View.VISIBLE
-                getId()
+
+                //getting user profile data
+                val request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken()) { jsonObject, response ->
+                    facebookJSONData = jsonObject
+
+                    //to tutaj żeby wykonywało się po ściągnięciu danych usera
+                    registerUser()
+                }
+
+                val parameters = Bundle()
+                parameters.putString("fields", "id,first_name,last_name,email")
+                request.parameters = parameters
+                request.executeAsync()
             }
 
             override fun onCancel() {
@@ -85,13 +100,20 @@ class LoginActivity : AppCompatActivity() {
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
         } else {
-            proceedToMap()
+            proceedToMapOrDataFill()
         }
     }
 
-    private fun proceedToMap() {
-        startActivity(Intent(applicationContext, MainActivity::class.java))
-        this.finish()
+    private fun proceedToMapOrDataFill() {
+        val user = MyApplication.currentUser
+
+        if(facebookJSONData != null && (user?.name == null || user?.surname == null || user?.email == null)){
+            startUserDataFillActivity()
+        }
+        else{
+            startActivity(Intent(applicationContext, MainActivity::class.java))
+        }
+
     }
 
     private fun registerUser() {
@@ -121,6 +143,15 @@ class LoginActivity : AppCompatActivity() {
         })
     }
 
+
+    private fun startUserDataFillActivity() {
+        val intent = Intent(this, UserDataFillActivity::class.java)
+        val facebookDataBundle = FBProfileDataHelper.jsonToBundle(facebookJSONData!!)
+        intent.putExtras(facebookDataBundle)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+    }
+
     private fun getUser(id: Int) {
         UsersCalls.getUserById(id, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
@@ -145,7 +176,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION -> {
-                proceedToMap()
+                proceedToMapOrDataFill()
                 return
             }
 
