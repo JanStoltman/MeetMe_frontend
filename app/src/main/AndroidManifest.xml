@@ -70,11 +70,9 @@
         <activity
             android:name=".ui.activities.AddEventActivity"
             android:screenOrientation="portrait" />
-            android:label="@string/title_activity_maps" />
-        <activity android:name=".ui.activities.EventDetailsActivity" />
-        <activity android:name=".ui.activities.UserProfileActivity" />
-        <activity android:name=".ui.activities.UserDataFillActivity" />
-        <activity android:name=".ui.activities.AddEventActivity" />
+        <activity
+            android:name=".ui.activities.UserDataFillActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
