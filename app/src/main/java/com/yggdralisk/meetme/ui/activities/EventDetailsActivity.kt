@@ -58,7 +58,9 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         popoulateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
 
-        if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
+        if (MyApplication.userId == eventToDisplay?.creator ?: true) {
+            joinButton.text = getString(R.string.your_event)
+        } else if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
             joinButton.text = getString(R.string.leave_event)
 
             joinButton.setOnClickListener({

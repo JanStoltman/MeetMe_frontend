@@ -89,7 +89,13 @@ class AddEventActivity : AppCompatActivity() {
     }
 
     private fun postEvent() {
-        val ageRestriction = AgeRestriction(maxAge = maxAge.text.toString().toInt(), minAge = minAge.text.toString().toInt())
+        val ageRestriction = try {
+           AgeRestriction(maxAge = maxAge.text.toString().toInt(), minAge = minAge.text.toString().toInt())
+        }catch (e: Exception){
+            AgeRestriction(1,99)
+        }
+        var startTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute")
+        var endTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd")
 
         val event = EventModel(ageRestriction = ageRestriction,
                 creator = MyApplication.userId,
@@ -105,8 +111,8 @@ class AddEventActivity : AppCompatActivity() {
                 name = eventNameEdit.text.toString(),
                 locationName = choosenPlace?.name?.toString() ?: "",
                 timeCreated = System.currentTimeMillis()/1000,
-                endTime = TimestampManager(baseContext).dateToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute"),
-                startTime = TimestampManager(baseContext).dateToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"),
+                startTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute"),
+                endTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"),
                 address = choosenPlace?.address?.toString())
 
         EventCalls.postEvent(event, object: MyCallback<EventModel>(this){
@@ -140,7 +146,7 @@ class AddEventActivity : AppCompatActivity() {
             val hour = c.get(Calendar.HOUR_OF_DAY)
             val minute = c.get(Calendar.MINUTE)
 
-            isEnd = savedInstanceState?.getBoolean("is_end") ?: false
+            isEnd = arguments?.getBoolean("is_end") ?: false
 
             return TimePickerDialog(activity, this, hour, minute,
                     DateFormat.is24HourFormat(activity))
@@ -166,7 +172,7 @@ class AddEventActivity : AppCompatActivity() {
             val month = c.get(Calendar.MONTH)
             val day = c.get(Calendar.DAY_OF_MONTH)
 
-            isEnd = savedInstanceState?.getBoolean("is_end") ?: false
+            isEnd = arguments?.getBoolean("is_end") ?: false
 
             return DatePickerDialog(activity!!, this, year, month, day)
         }
