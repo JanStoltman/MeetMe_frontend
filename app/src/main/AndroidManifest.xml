@@ -73,6 +73,13 @@
         <activity
             android:name=".ui.activities.UserDataFillActivity"
             android:screenOrientation="portrait" />
+
+        <service android:name=".utility.notifications.MyIntentService"
+            android:exported="false"/>
+        
+        <receiver android:name=".utility.notifications.MyReceiver"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 
 </manifest>

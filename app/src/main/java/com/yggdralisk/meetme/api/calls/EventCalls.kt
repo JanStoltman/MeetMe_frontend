@@ -1,5 +1,6 @@
 package com.yggdralisk.meetme.api.calls
 
+import android.view.ViewDebug
 import com.yggdralisk.meetme.api.APIGenerator
 import com.yggdralisk.meetme.api.interfaces.EventInterface
 import com.yggdralisk.meetme.api.models.EventModel
@@ -37,6 +38,16 @@ class EventCalls {
 
         fun leaveEvent(id:Int, callback: Callback<EventModel>) {
             val call = APIGenerator.createService(EventInterface::class.java).leaveEvent(id)
+            call.enqueue(callback)
+        }
+
+        fun deleteEvent(id: Int, callback: Callback<EventModel>){
+            val call = APIGenerator.createService(EventInterface::class.java).deleteEvent(id)
+            call.enqueue(callback)
+        }
+
+        fun rateEvent(id: Int, grade: Float, callback: Callback<Float>){
+            val call = APIGenerator.createService(EventInterface::class.java).rateEvent(id, grade)
             call.enqueue(callback)
         }
     }

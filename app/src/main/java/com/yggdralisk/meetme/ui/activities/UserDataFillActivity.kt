@@ -110,7 +110,8 @@ class UserDataFillActivity : AppCompatActivity() {
         val user = MyApplication.currentUser
 
         if (facebookData.containsKey("id")) {
-            val facebookId = facebookData["id"] as? String //unused
+            val facebookId = facebookData["id"] as? String
+            user?.photoImage = user?.photoImage ?: "https://graph.facebook.com/" + facebookId + "/picture?type=large"
         }
 
         if (facebookData.containsKey("first_name")){
@@ -123,7 +124,6 @@ class UserDataFillActivity : AppCompatActivity() {
             user?.email = user?.email ?: facebookData["email"] as? String
         }
 
-        user?.photoImage = user?.photoImage ?: "https://graph.facebook.com/" + facebookData["id"] + "/picture?type=large"
     }
 
 }

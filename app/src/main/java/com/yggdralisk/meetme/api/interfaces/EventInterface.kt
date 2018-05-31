@@ -2,10 +2,7 @@ package com.yggdralisk.meetme.api.interfaces
 
 import com.yggdralisk.meetme.api.models.EventModel
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Path
+import retrofit2.http.*
 
 /**
  * Created by Jan Stoltman on 4/8/18.
@@ -28,4 +25,10 @@ interface EventInterface {
 
     @POST("/api/Events/{id}/Leave")
     fun leaveEvent(@Path("id") id: Int): Call<EventModel>
+
+    @DELETE("/api/Events/{id}")
+    fun deleteEvent(@Path("id") id: Int): Call<EventModel>
+
+    @POST("api/Events/{id}/Rate")
+    fun rateEvent(@Path("id") id: Int, @Query("grade") grade: Float): Call<Float>
 }

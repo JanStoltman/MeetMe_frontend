@@ -23,9 +23,13 @@ class TimestampManager(private val context: Context){
     }
 
     fun toDateHourString(timestamp:Long):String{
-        val timestampMilis = timestamp * 1000L
-        cal.timeInMillis = timestampMilis
-        return formatDateHour.format(cal.time)
+        if(timestamp != 0L){
+            val timestampMilis = timestamp * 1000L
+            cal.timeInMillis = timestampMilis
+            return formatDateHour.format(cal.time)
+        }
+        else
+            return ""
     }
 
     fun dateToTimestamp(dateString:String):Long{
@@ -60,4 +64,16 @@ class TimestampManager(private val context: Context){
             return context.resources.configuration.locale
         }
     }
+
+    fun getTimestampHourBefore(timestamp: Long):Long{
+        val timestampMilis = timestamp * 1000L
+        cal.timeInMillis = timestampMilis
+        cal.add(Calendar.HOUR, -1)
+        val return_timestamp = cal.timeInMillis / 1000
+        return return_timestamp
+    }
+
+//    fun isPast(timestamp: Long):Boolean{
+//        //return
+//    }
 }

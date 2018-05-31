@@ -43,6 +43,7 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
     override fun onResume() {
         super.onResume()
         callEvents()
+        callMyEvents()
     }
 
     private fun startAddEventActivity() {

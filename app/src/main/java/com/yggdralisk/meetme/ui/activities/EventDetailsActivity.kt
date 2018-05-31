@@ -2,6 +2,7 @@ package com.yggdralisk.meetme.ui.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
@@ -16,7 +17,6 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.nostra13.universalimageloader.core.ImageLoader
 import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
@@ -25,6 +25,7 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.SimpleUserModel
 import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import com.yggdralisk.meetme.utility.TimestampManager
 import kotlinx.android.synthetic.main.activity_event_details.*
 import retrofit2.Call
@@ -59,7 +60,29 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         (mapView as SupportMapFragment).getMapAsync(this)
 
         if (MyApplication.userId == eventToDisplay?.creator ?: true) {
-            joinButton.text = getString(R.string.your_event)
+
+            //TODO remove this
+            //NotificationHelper.remindUser(this@EventDetailsActivity, eventToDisplay!!)
+
+//            joinButton.text = getString(R.string.your_event)
+            joinButton.text = getString(R.string.cancel_event)
+            joinButton.setBackgroundColor(Color.RED)
+            //TODO ask user if he's sure (dialog?)
+            joinButton.setOnClickListener({
+                eventToDisplay?.let {
+                    EventCalls.deleteEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this){
+                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                            super.onResponse(call, response)
+                            if(response?.isSuccessful == true){
+                                Toast.makeText(baseContext, "Event deleted", Toast.LENGTH_SHORT).show()
+                                this@EventDetailsActivity.finish()
+                            }
+                        }
+                    })
+                }
+
+            })
+
         } else if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
             joinButton.text = getString(R.string.leave_event)
 
@@ -76,6 +99,22 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     })
                 }
             })
+
+            //TODO rate event if ended (or started?)
+
+            ratingBar.visibility = View.VISIBLE
+            rateButton.visibility = View.VISIBLE
+            rateButton.setOnClickListener({
+                eventToDisplay?.let {
+                    EventCalls.rateEvent(eventToDisplay?.id!!, ratingBar.rating, object : MyCallback<Float>(this){
+                        override fun onResponse(call: Call<Float>?, response: Response<Float>?) {
+                            super.onResponse(call, response)
+                            rateButton.visibility = View.INVISIBLE
+                        }
+                    })
+                }
+            })
+
         } else if (eventToDisplay?.guestLimit ?: 4 <= eventToDisplay?.guests?.size ?: 1) {
             joinButton.text = this.getText(R.string.event_full)
         } else {
@@ -85,6 +124,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                         override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                             super.onResponse(call, response)
                             if (response?.isSuccessful == true) {
+                                //notification
+                                NotificationHelper.remindUser(this@EventDetailsActivity, eventToDisplay!!)
                                 Toast.makeText(baseContext, "Event joined", Toast.LENGTH_LONG).show()
                                 this@EventDetailsActivity.finish()
                             }
@@ -111,10 +152,10 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         eventName.text = eventToDisplay?.name ?: ""
         locationName.text = eventToDisplay?.locationName ?: ""
         eventDescription.text = eventToDisplay?.description ?: ""
-        ImageLoader.getInstance()
-                .displayImage(eventToDisplay?.qrCodeLink?.code
-                        ?: "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
-                        qrCodeImage)
+//        ImageLoader.getInstance()
+//                .displayImage(eventToDisplay?.qrCodeLink?.code
+//                        ?: "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
+//                        qrCodeImage)
         startTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.startTime ?: 0)
         endTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.endTime ?: 0)
         locationAddress.text = eventToDisplay?.address ?: ""

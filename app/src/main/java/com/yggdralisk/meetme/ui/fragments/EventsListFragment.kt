@@ -37,6 +37,7 @@ class EventsListFragment : Fragment() {
 
         view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)?.setOnRefreshListener {
             provider?.callEvents()
+            provider?.callMyEvents()
             view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout).isRefreshing = false
         }
 
@@ -57,7 +58,8 @@ class EventsListFragment : Fragment() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val event = provider?.getEvents()?.get(position)
             holder.rowView.findViewById<TextView>(R.id.eventName)?.text = event?.name
-            holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size, event?.guestLimit)
+            holder.rowView.findViewById<TextView>(R.id.placeName)?.text = event?.locationName
+            holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event?.guests?.size!! + 1, event?.guestLimit!! + 1)
 
             if (event?.guestLimit == null || event.guests == null || event.guestLimit!! > event.guests!!.size) {
                 holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
