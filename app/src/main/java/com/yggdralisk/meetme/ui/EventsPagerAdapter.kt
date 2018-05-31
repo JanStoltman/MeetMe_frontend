@@ -119,6 +119,7 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
     }
 
     fun refreshEvents() {
+        //TODO: Remove events from map
         if (googleMapRef != null && googleMapRef!!.get() != null) {
             addEventsToMap(googleMapRef!!.get())
         }
