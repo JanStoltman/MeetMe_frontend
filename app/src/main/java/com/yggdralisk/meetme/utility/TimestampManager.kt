@@ -10,10 +10,10 @@ import java.util.*
  * Created by Maciek on 2018-04-16.
  */
 class TimestampManager(private val context: Context){
-    val currentLocale = getCurrentLocale(context)
-    val formatDate = SimpleDateFormat("dd.MM.yyyy", currentLocale)
-    val formatDateHour = SimpleDateFormat("dd.MM.yyyy hh:mm", currentLocale)
-    val cal = Calendar.getInstance(currentLocale)
+    private val currentLocale = getCurrentLocale(context)
+    private val formatDate = SimpleDateFormat("dd.MM.yyyy", currentLocale)
+    private val formatDateHour = SimpleDateFormat("dd.MM.yyyy hh:mm", currentLocale)
+    private val cal = Calendar.getInstance(currentLocale)!!
 
     fun toDateString(timestamp:Long):String{
         val timestampMilis = timestamp * 1000L
@@ -22,15 +22,12 @@ class TimestampManager(private val context: Context){
         return formatDate.format(cal.time)
     }
 
-    fun toDateHourString(timestamp:Long):String{
-        if(timestamp != 0L){
+    fun toDateHourString(timestamp:Long):String = if(timestamp != 0L){
             val timestampMilis = timestamp * 1000L
             cal.timeInMillis = timestampMilis
-            return formatDateHour.format(cal.time)
+            formatDateHour.format(cal.time)
         }
-        else
-            return ""
-    }
+        else ""
 
     fun dateToTimestamp(dateString:String):Long{
         var timestamp = 0L
@@ -56,14 +53,12 @@ class TimestampManager(private val context: Context){
         return timestamp
     }
 
-    private fun getCurrentLocale(context:Context):Locale{
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            return context.resources.configuration.locales.get(0)
+    private fun getCurrentLocale(context:Context):Locale = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+            context.resources.configuration.locales.get(0)
         } else{
-            //noinspection deprecation
-            return context.resources.configuration.locale
+            context.resources.configuration.locale
         }
-    }
+
 
     fun getTimestampHourBefore(timestamp: Long):Long{
         val timestampMilis = timestamp * 1000L
@@ -72,6 +67,8 @@ class TimestampManager(private val context: Context){
         val return_timestamp = cal.timeInMillis / 1000
         return return_timestamp
     }
+
+    fun isTimestampInPast(timestamp: Long):Boolean = timestamp <= ( System.currentTimeMillis() / 1000)
 
 //    fun isPast(timestamp: Long):Boolean{
 //        //return
