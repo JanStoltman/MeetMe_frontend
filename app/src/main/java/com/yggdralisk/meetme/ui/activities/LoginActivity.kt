@@ -107,7 +107,7 @@ class LoginActivity : AppCompatActivity() {
     private fun proceedToMapOrDataFill() {
         val user = MyApplication.currentUser
 
-        if(facebookJSONData != null && (user?.name == null || user?.surname == null || user?.email == null)){
+        if(facebookJSONData != null && (user?.name == null || user.surname == null || user.email == null)){
             startUserDataFillActivity()
         }
         else{
@@ -159,6 +159,7 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
                 MyApplication.currentUser = response?.body()
+
                 askForPermissions()
             }
         })

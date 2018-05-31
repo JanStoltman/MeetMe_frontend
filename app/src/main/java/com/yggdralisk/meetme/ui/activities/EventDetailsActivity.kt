@@ -1,9 +1,11 @@
 package com.yggdralisk.meetme.ui.activities
 
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
@@ -25,8 +27,8 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
 import com.yggdralisk.meetme.api.models.SimpleUserModel
 import com.yggdralisk.meetme.api.models.UserModel
-import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import com.yggdralisk.meetme.utility.TimestampManager
+import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import kotlinx.android.synthetic.main.activity_event_details.*
 import retrofit2.Call
 import retrofit2.Response
@@ -60,44 +62,27 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         (mapView as SupportMapFragment).getMapAsync(this)
 
         if (MyApplication.userId == eventToDisplay?.creator ?: true) {
-
-            //TODO remove this
-            //NotificationHelper.remindUser(this@EventDetailsActivity, eventToDisplay!!)
-
-//            joinButton.text = getString(R.string.your_event)
             joinButton.text = getString(R.string.cancel_event)
             joinButton.setBackgroundColor(Color.RED)
-            //TODO ask user if he's sure (dialog?)
             joinButton.setOnClickListener({
-                eventToDisplay?.let {
-                    EventCalls.deleteEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this){
-                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
-                            super.onResponse(call, response)
-                            if(response?.isSuccessful == true){
-                                Toast.makeText(baseContext, "Event deleted", Toast.LENGTH_SHORT).show()
-                                this@EventDetailsActivity.finish()
-                            }
+                val deleteDialogListener = DialogInterface.OnClickListener { _, which ->
+                    when (which) {
+                        DialogInterface.BUTTON_POSITIVE -> {
+                            deleteEvent()
                         }
-                    })
+
+                        DialogInterface.BUTTON_NEGATIVE -> {
+                        }
+                    }
                 }
 
+                AlertDialog.Builder(applicationContext).setMessage("Are you sure?").setPositiveButton("Yes", deleteDialogListener)
+                        .setNegativeButton("No", deleteDialogListener).show()
             })
-
         } else if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
             joinButton.text = getString(R.string.leave_event)
-
             joinButton.setOnClickListener({
-                eventToDisplay?.let {
-                    EventCalls.leaveEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
-                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
-                            super.onResponse(call, response)
-                            if (response?.isSuccessful == true) {
-                                Toast.makeText(baseContext, "Event left", Toast.LENGTH_LONG).show()
-                                this@EventDetailsActivity.finish()
-                            }
-                        }
-                    })
-                }
+                leaveEvent()
             })
 
             //TODO rate event if ended (or started?)
@@ -105,32 +90,68 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             ratingBar.visibility = View.VISIBLE
             rateButton.visibility = View.VISIBLE
             rateButton.setOnClickListener({
-                eventToDisplay?.let {
-                    EventCalls.rateEvent(eventToDisplay?.id!!, ratingBar.rating, object : MyCallback<Float>(this){
-                        override fun onResponse(call: Call<Float>?, response: Response<Float>?) {
-                            super.onResponse(call, response)
-                            rateButton.visibility = View.INVISIBLE
-                        }
-                    })
-                }
+                rateEvent()
             })
 
         } else if (eventToDisplay?.guestLimit ?: 4 <= eventToDisplay?.guests?.size ?: 1) {
             joinButton.text = this.getText(R.string.event_full)
         } else {
             joinButton.setOnClickListener({
-                eventToDisplay?.let {
-                    EventCalls.joinEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
-                        override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
-                            super.onResponse(call, response)
-                            if (response?.isSuccessful == true) {
-                                //notification
-                                NotificationHelper.remindUser(this@EventDetailsActivity, eventToDisplay!!)
-                                Toast.makeText(baseContext, "Event joined", Toast.LENGTH_LONG).show()
-                                this@EventDetailsActivity.finish()
-                            }
-                        }
-                    })
+                joinEvent()
+            })
+        }
+    }
+
+    private fun joinEvent() {
+        eventToDisplay?.let {
+            EventCalls.joinEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                    super.onResponse(call, response)
+                    if (response?.isSuccessful == true) {
+                        //notification
+                        NotificationHelper.remindUser(this@EventDetailsActivity, eventToDisplay!!)
+                        Toast.makeText(baseContext, "Event joined", Toast.LENGTH_LONG).show()
+                        this@EventDetailsActivity.finish()
+                    }
+                }
+            })
+        }
+    }
+
+    private fun rateEvent() {
+        eventToDisplay?.let {
+            EventCalls.rateEvent(eventToDisplay?.id!!, ratingBar.rating, object : MyCallback<Float>(this) {
+                override fun onResponse(call: Call<Float>?, response: Response<Float>?) {
+                    super.onResponse(call, response)
+                    rateButton.visibility = View.INVISIBLE
+                }
+            })
+        }
+    }
+
+    private fun leaveEvent() {
+        eventToDisplay?.let {
+            EventCalls.leaveEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                    super.onResponse(call, response)
+                    if (response?.isSuccessful == true) {
+                        Toast.makeText(baseContext, "Event left", Toast.LENGTH_LONG).show()
+                        this@EventDetailsActivity.finish()
+                    }
+                }
+            })
+        }
+    }
+
+    private fun deleteEvent() {
+        eventToDisplay?.let {
+            EventCalls.deleteEvent(eventToDisplay?.id!!, object : MyCallback<EventModel>(this) {
+                override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                    super.onResponse(call, response)
+                    if (response?.isSuccessful == true) {
+                        Toast.makeText(baseContext, "Event deleted", Toast.LENGTH_SHORT).show()
+                        this@EventDetailsActivity.finish()
+                    }
                 }
             })
         }
@@ -192,7 +213,6 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     intent.putExtra(UserProfileActivity.USER_ID, eventToDisplay?.creator ?: 1)
                     this@EventDetailsActivity.startActivity(intent)
                 })
-
             }
         })
     }

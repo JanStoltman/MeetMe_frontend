@@ -83,19 +83,40 @@ class AddEventActivity : AppCompatActivity() {
         })
 
         saveButton.setOnClickListener({
-            //TODO: Validate data
-            postEvent()
+            if (validateData()) {
+                postEvent()
+            } else {
+                Toast.makeText(baseContext, "Invalid data!", Toast.LENGTH_LONG).show()
+            }
         })
+    }
+
+    private fun validateData(): Boolean {
+        val endCalendar = Calendar.getInstance()
+        endCalendar.set(Calendar.YEAR, chosenYearEnd.toInt())
+        endCalendar.set(Calendar.YEAR, chosenYearEnd.toInt())
+        endCalendar.set(Calendar.YEAR, chosenYearEnd.toInt())
+
+        val startCalendar = Calendar.getInstance()
+        startCalendar.set(Calendar.YEAR, chosenYear.toInt())
+        startCalendar.set(Calendar.YEAR, chosenYear.toInt())
+        startCalendar.set(Calendar.YEAR, chosenYear.toInt())
+
+        return endCalendar.timeInMillis > startCalendar.timeInMillis ||
+                descriptionEdit.text.isNullOrBlank() ||
+                guestLimit.text.isNullOrBlank() ||
+                eventNameEdit.text.isNullOrBlank() ||
+                choosenPlace == null
     }
 
     private fun postEvent() {
         val ageRestriction = try {
-           AgeRestriction(maxAge = maxAge.text.toString().toInt(), minAge = minAge.text.toString().toInt())
-        }catch (e: Exception){
-            AgeRestriction(1,99)
+            AgeRestriction(maxAge = maxAge.text.toString().toInt(), minAge = minAge.text.toString().toInt())
+        } catch (e: Exception) {
+            AgeRestriction(1, 99)
         }
-        var startTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute")
-        var endTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd")
+        val startTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute")
+        val endTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd")
 
         val event = EventModel(ageRestriction = ageRestriction,
                 creator = MyApplication.userId,
@@ -110,15 +131,19 @@ class AddEventActivity : AppCompatActivity() {
                 qrCodeLink = QrCode(""),
                 name = eventNameEdit.text.toString(),
                 locationName = choosenPlace?.name?.toString() ?: "",
-                timeCreated = System.currentTimeMillis()/1000,
-                startTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDay.$chosenMonth.$chosenYear $chosenHour:$chosenMinute"),
-                endTime = TimestampManager(baseContext).dateHourToTimestamp("$chosenDayEnd.$chosenMonthEnd.$chosenYearEnd $chosenHourEnd:$chosenMinuteEnd"),
+                timeCreated = System.currentTimeMillis() / 1000,
+                startTime = startTime,
+                endTime = endTime,
                 address = choosenPlace?.address?.toString())
 
-        EventCalls.postEvent(event, object: MyCallback<EventModel>(this){
+        postEvent(event)
+    }
+
+    private fun postEvent(event: EventModel) {
+        EventCalls.postEvent(event, object : MyCallback<EventModel>(this) {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
-                if(response?.isSuccessful == true){
+                if (response?.isSuccessful == true) {
                     this@AddEventActivity.finish()
                 }
             }
