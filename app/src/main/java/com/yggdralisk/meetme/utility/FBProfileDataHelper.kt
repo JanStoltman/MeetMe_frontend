@@ -33,6 +33,16 @@ class FBProfileDataHelper {
             }
             return bundle
         }
+
+        fun getFbData(callback: GraphRequest.GraphJSONObjectCallback){
+            val request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(), callback)
+
+            val parameters = Bundle()
+            parameters.putString("fields", "id,first_name,last_name,email")
+            request.parameters = parameters
+            request.executeAsync()
+        }
+
     }
 
 

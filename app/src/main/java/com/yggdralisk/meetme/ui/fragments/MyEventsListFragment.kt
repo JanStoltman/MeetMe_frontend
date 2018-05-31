@@ -45,6 +45,7 @@ class MyEventsListFragment : Fragment() {
 
         view?.findViewById<ImageButton>(R.id.profileButton)?.setOnClickListener({
             val intent = Intent(context, UserDataFillActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             intent.putExtras(Bundle.EMPTY)
             startActivity(intent)
         })

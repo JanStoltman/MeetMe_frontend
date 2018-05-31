@@ -3,6 +3,7 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import com.facebook.AccessToken
 import com.facebook.GraphRequest
@@ -13,6 +14,9 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.UsersCalls
+import com.yggdralisk.meetme.utility.FBProfileDataHelper
+import kotlinx.android.synthetic.main.activity_user_data_fill.*
+import kotlinx.android.synthetic.main.events_list_frgment.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -22,17 +26,15 @@ class UserDataFillActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_data_fill)
-        val facebookData = intent.extras
-        mergeUserDataWithFacebookData(facebookData)
+        //val facebookData = intent.extras
 
         readUserData()
 
-//        val user = MyApplication.currentUser
-//        //TODO check if user has all obligatory fields filled, if not - get data from facebook
-//        if(user?.name == null || user?.surname == null || user?.email == null){
-//            Toast.makeText(this, "Fill missing user data", Toast.LENGTH_LONG).show()
-//            mergeUserDataWithFacebookData()
-//        }
+        val user = MyApplication.currentUser
+        //check if user has all obligatory fields filled, if not - get data from facebook
+        if(user?.name == null || user?.surname == null || user?.email == null){
+            mergeWithFaceboookData()
+        }
 
         setListeners()
     }
@@ -41,7 +43,14 @@ class UserDataFillActivity : AppCompatActivity() {
         findViewById<Button>(R.id.logoutButton)?.setOnClickListener({
             disconnectFromFacebook()
         })
-        findViewById<Button>(R.id.saveButton)?.setOnClickListener { saveUserData() }
+
+        findViewById<Button>(R.id.saveButton)?.setOnClickListener {
+            saveUserData()
+        }
+
+        findViewById<Button>(R.id.fbButton)?.setOnClickListener {
+            replaceWithFaceboookData()
+        }
     }
 
     private fun disconnectFromFacebook() {
@@ -88,11 +97,12 @@ class UserDataFillActivity : AppCompatActivity() {
             //TODO
             //verifyUserInput()
 
-            //TODO spinner
+            progressBar.visibility = View.VISIBLE
 
             UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(this) {
                 override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                     super.onResponse(call, response)
+                    progressBar.visibility = View.GONE
                     Toast.makeText(applicationContext, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
                     startMainActivity()
                 }
@@ -124,6 +134,46 @@ class UserDataFillActivity : AppCompatActivity() {
             user?.email = user?.email ?: facebookData["email"] as? String
         }
 
+    }
+
+    private fun fillUserDataWithFacebookData(facebookData : Bundle){
+        val user = MyApplication.currentUser
+
+        if (facebookData.containsKey("id")) {
+            val facebookId = facebookData["id"] as? String
+            user?.photoImage = "https://graph.facebook.com/" + facebookId + "/picture?type=large"
+        }
+
+        if (facebookData.containsKey("first_name")){
+            user?.name = facebookData["first_name"] as? String
+        }
+        if (facebookData.containsKey("last_name")){
+            user?.surname = facebookData["last_name"] as? String
+        }
+        if (facebookData.containsKey("email")){
+            user?.email = facebookData["email"] as? String
+        }
+
+    }
+
+    private fun replaceWithFaceboookData(){
+        progressBar.visibility = View.VISIBLE
+        FBProfileDataHelper.getFbData(GraphRequest.GraphJSONObjectCallback({ jsonObject, response ->
+            val fbDataBundle = FBProfileDataHelper.jsonToBundle(jsonObject)
+            fillUserDataWithFacebookData(fbDataBundle)
+            readUserData()
+            progressBar.visibility = View.GONE
+        }))
+    }
+
+    private fun mergeWithFaceboookData(){
+        progressBar.visibility = View.VISIBLE
+        FBProfileDataHelper.getFbData(GraphRequest.GraphJSONObjectCallback({ jsonObject, response ->
+            val fbDataBundle = FBProfileDataHelper.jsonToBundle(jsonObject)
+            mergeUserDataWithFacebookData(fbDataBundle)
+            readUserData()
+            progressBar.visibility = View.GONE
+        }))
     }
 
 }

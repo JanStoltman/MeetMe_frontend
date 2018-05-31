@@ -37,12 +37,11 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val callbackManager = CallbackManager.Factory.create()
-    private var facebookJSONData : JSONObject? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_main)
-        loginButton.setReadPermissions(listOf(EMAIL))
+//        loginButton.setReadPermissions(listOf(EMAIL))
 
         if (checkFacebookToken()) {
             getId()
@@ -57,25 +56,14 @@ class LoginActivity : AppCompatActivity() {
     private fun setupLoginBUtton() {
         loginButton.visibility = View.VISIBLE
         loadingSpinner.visibility = View.INVISIBLE
-        loginButton.setReadPermissions(listOf(
-                "public_profile", "email"))
+//        loginButton.setReadPermissions(listOf(
+//                "public_profile", "email"))
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
                 loginButton.visibility = View.INVISIBLE
                 loadingSpinner.visibility = View.VISIBLE
 
-                //getting user profile data
-                val request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken()) { jsonObject, response ->
-                    facebookJSONData = jsonObject
-
-                    //to tutaj żeby wykonywało się po ściągnięciu danych usera
-                    registerUser()
-                }
-
-                val parameters = Bundle()
-                parameters.putString("fields", "id,first_name,last_name,email")
-                request.parameters = parameters
-                request.executeAsync()
+                registerUser()
             }
 
             override fun onCancel() {
@@ -107,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
     private fun proceedToMapOrDataFill() {
         val user = MyApplication.currentUser
 
-        if(facebookJSONData != null && (user?.name == null || user?.surname == null || user?.email == null)){
+        if(user?.name == null || user?.surname == null || user?.email == null){
             startUserDataFillActivity()
         }
         else{
@@ -148,8 +136,8 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startUserDataFillActivity() {
         val intent = Intent(this, UserDataFillActivity::class.java)
-        val facebookDataBundle = FBProfileDataHelper.jsonToBundle(facebookJSONData!!)
-        intent.putExtras(facebookDataBundle)
+        //val facebookDataBundle = FBProfileDataHelper.jsonToBundle(facebookJSONData!!)
+        //intent.putExtras(facebookDataBundle)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
