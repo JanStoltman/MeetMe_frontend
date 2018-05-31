@@ -48,7 +48,8 @@ class MyIntentService(name: String) : IntentService(name){
                 //TODO change icon
                 .setSmallIcon(R.drawable.ic_add_circle_outline_white_24dp)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
+                //uncomment to enable navigation to event
+                //.setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()
 
