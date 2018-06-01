@@ -41,7 +41,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_main)
-//        loginButton.setReadPermissions(listOf(EMAIL))
+        loginButton.setReadPermissions(listOf(EMAIL))
 
         if (checkFacebookToken()) {
             getId()
@@ -56,8 +56,6 @@ class LoginActivity : AppCompatActivity() {
     private fun setupLoginBUtton() {
         loginButton.visibility = View.VISIBLE
         loadingSpinner.visibility = View.INVISIBLE
-//        loginButton.setReadPermissions(listOf(
-//                "public_profile", "email"))
         loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult> {
             override fun onSuccess(result: LoginResult?) {
                 loginButton.visibility = View.INVISIBLE
@@ -95,7 +93,7 @@ class LoginActivity : AppCompatActivity() {
     private fun proceedToMapOrDataFill() {
         val user = MyApplication.currentUser
 
-        if(user?.name == null || user?.surname == null || user?.email == null){
+        if(user?.name.isNullOrBlank() || user?.surname.isNullOrBlank() || user?.email.isNullOrBlank()){
             startUserDataFillActivity()
         }
         else{
@@ -136,8 +134,6 @@ class LoginActivity : AppCompatActivity() {
 
     private fun startUserDataFillActivity() {
         val intent = Intent(this, UserDataFillActivity::class.java)
-        //val facebookDataBundle = FBProfileDataHelper.jsonToBundle(facebookJSONData!!)
-        //intent.putExtras(facebookDataBundle)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }

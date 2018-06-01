@@ -3,6 +3,7 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Patterns
 import android.view.View
 import android.widget.*
 import com.facebook.AccessToken
@@ -14,6 +15,7 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.UsersCalls
+import com.yggdralisk.meetme.api.models.UserModel
 import com.yggdralisk.meetme.utility.FBProfileDataHelper
 import kotlinx.android.synthetic.main.activity_user_data_fill.*
 import kotlinx.android.synthetic.main.events_list_frgment.*
@@ -32,7 +34,7 @@ class UserDataFillActivity : AppCompatActivity() {
 
         val user = MyApplication.currentUser
         //check if user has all obligatory fields filled, if not - get data from facebook
-        if(user?.name == null || user?.surname == null || user?.email == null){
+        if(user?.name.isNullOrBlank() || user?.surname.isNullOrBlank() || user?.email.isNullOrBlank()){
             mergeWithFaceboookData()
         }
 
@@ -94,19 +96,23 @@ class UserDataFillActivity : AppCompatActivity() {
             //user.birthDay = view?.findViewById<EditText>(R.id.birthdateTextView)?.text.toString().toLong()
             user?.bio = findViewById<EditText>(R.id.bioTextView)?.text.toString()
 
-            //TODO
-            //verifyUserInput()
+            user?.let {
+                if(dataIsValid(user)){
+                    progressBar.visibility = View.VISIBLE
 
-            progressBar.visibility = View.VISIBLE
-
-            UsersCalls.updateMyData(user!!, object : MyCallback<ResponseBody>(this) {
-                override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
-                    super.onResponse(call, response)
-                    progressBar.visibility = View.GONE
-                    Toast.makeText(applicationContext, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
-                    startMainActivity()
+                    UsersCalls.updateMyData(user, object : MyCallback<ResponseBody>(this) {
+                        override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
+                            super.onResponse(call, response)
+                            progressBar.visibility = View.GONE
+                            Toast.makeText(applicationContext, getString(R.string.data_saved), Toast.LENGTH_SHORT).show()
+                            startMainActivity()
+                        }
+                    })
                 }
-            })
+            }
+
+
+
         }
     }
 
@@ -121,17 +127,25 @@ class UserDataFillActivity : AppCompatActivity() {
 
         if (facebookData.containsKey("id")) {
             val facebookId = facebookData["id"] as? String
-            user?.photoImage = user?.photoImage ?: "https://graph.facebook.com/" + facebookId + "/picture?type=large"
+            if(user?.photoImage.isNullOrBlank()){
+                user?.photoImage = user?.photoImage ?: "https://graph.facebook.com/" + facebookId + "/picture?type=large"
+            }
         }
 
         if (facebookData.containsKey("first_name")){
-            user?.name = user?.name ?: facebookData["first_name"] as? String
+            if(user?.name.isNullOrBlank()){
+                user?.name = facebookData["first_name"] as? String
+            }
         }
         if (facebookData.containsKey("last_name")){
-            user?.surname = user?.surname ?: facebookData["last_name"] as? String
+            if(user?.surname.isNullOrBlank()){
+                user?.surname = facebookData["last_name"] as? String
+            }
         }
         if (facebookData.containsKey("email")){
-            user?.email = user?.email ?: facebookData["email"] as? String
+            if(user?.email.isNullOrBlank()){
+                user?.email = facebookData["email"] as? String
+            }
         }
 
     }
@@ -174,6 +188,26 @@ class UserDataFillActivity : AppCompatActivity() {
             readUserData()
             progressBar.visibility = View.GONE
         }))
+    }
+
+    private fun dataIsValid(user: UserModel): Boolean{
+        if(user.name.isNullOrBlank()){
+            Toast.makeText(this, getString(R.string.user_name_empty), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if(user.surname.isNullOrBlank()){
+            Toast.makeText(this, getString(R.string.user_surname_empty), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else if(!isValidEmail(user.email)){
+            Toast.makeText(this, getString(R.string.user_email_invalid), Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
+    fun isValidEmail(string: String?): Boolean{
+        return !string.isNullOrBlank() && Patterns.EMAIL_ADDRESS.matcher(string).matches()
     }
 
 }

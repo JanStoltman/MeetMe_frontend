@@ -50,5 +50,10 @@ class EventCalls {
             val call = APIGenerator.createService(EventInterface::class.java).rateEvent(id, grade)
             call.enqueue(callback)
         }
+
+        fun wasRated(id: Int, callback: Callback<Boolean>){
+            val call = APIGenerator.createService(EventInterface::class.java).wasRated(id)
+            call.enqueue(callback)
+        }
     }
 }

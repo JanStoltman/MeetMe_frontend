@@ -41,6 +41,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     var eventToDisplay: EventModel? = null
     var eventGuests: ArrayList<SimpleUserModel> = arrayListOf()
+    var canRateEvent: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +53,37 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
+
+                eventToDisplay?.let {
+                    if(eventEnded(it)){
+                        checkIfNotRatedYet(eventId)
+                    }
+                    else{
+                        setEvent()
+                    }
+                }
+            }
+        })
+
+
+    }
+
+    private fun checkIfNotRatedYet(eventId: Int) {
+        EventCalls.wasRated(eventId, object : MyCallback<Boolean>(this@EventDetailsActivity) {
+            override fun onResponse(call: Call<Boolean>?, response: Response<Boolean>?) {
+                super.onResponse(call, response)
+                response?.body()?.let {
+                    canRateEvent = !it
+                }
+
                 setEvent()
             }
         })
+    }
+
+    private fun eventEnded(event: EventModel): Boolean {
+        val timestampManager = TimestampManager(this)
+        return event.endTime == null && timestampManager.isTimestampInPast(event.endTime!!)
     }
 
     private fun setEvent() {
@@ -85,13 +114,15 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 leaveEvent()
             })
 
-            //TODO rate event if ended (or started?)
+            if(canRateEvent){
+                ratingBar.visibility = View.VISIBLE
+                rateButton.visibility = View.VISIBLE
+                rateButton.setOnClickListener({
+                    rateEvent()
+                })
+            }
 
-            ratingBar.visibility = View.VISIBLE
-            rateButton.visibility = View.VISIBLE
-            rateButton.setOnClickListener({
-                rateEvent()
-            })
+
 
         } else if (eventToDisplay?.guestLimit ?: 4 <= eventToDisplay?.guests?.size ?: 1) {
             joinButton.text = this.getText(R.string.event_full)

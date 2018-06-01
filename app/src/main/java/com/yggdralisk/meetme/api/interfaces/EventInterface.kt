@@ -31,4 +31,7 @@ interface EventInterface {
 
     @POST("api/Events/{id}/Rate")
     fun rateEvent(@Path("id") id: Int, @Query("grade") grade: Float): Call<Float>
+
+    @GET("api/Events/{id}/WasRated")
+    fun wasRated(@Path("id") id: Int): Call<Boolean>
 }
