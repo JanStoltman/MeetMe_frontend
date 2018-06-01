@@ -12,6 +12,12 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.UserModel
 import retrofit2.Call
 import retrofit2.Response
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ApplicationInfo
+import android.net.Uri
+import kotlinx.android.synthetic.main.activity_user_profile.*
+
 
 class UserProfileActivity : AppCompatActivity() {
     companion object {
@@ -45,5 +51,23 @@ class UserProfileActivity : AppCompatActivity() {
         //findViewById<TextView>(R.id.birthdateTextView)?.setText(user?.birthDay.toString())
         findViewById<TextView>(R.id.bioTextView)?.text = user?.bio
         findViewById<TextView>(R.id.userRating).setText(String.format("%.2f", user?.rating))
+
+        facebookButton.setOnClickListener({v ->
+            startActivity(newFacebookIntent(packageManager, user?.token.toString()))
+        })
+    }
+
+    private fun newFacebookIntent(pm: PackageManager, url: String): Intent {
+        var uri = Uri.parse(url)
+        try {
+            val applicationInfo = pm.getApplicationInfo("com.facebook.katana", 0)
+            if (applicationInfo.enabled) {
+                // http://stackoverflow.com/a/24547437/1048340
+                uri = Uri.parse("fb://facewebmodal/f?href=$url")
+            }
+        } catch (ignored: PackageManager.NameNotFoundException) {
+        }
+
+        return Intent(Intent.ACTION_VIEW, uri)
     }
 }
