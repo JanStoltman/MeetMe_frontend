@@ -134,7 +134,8 @@ class AddEventActivity : AppCompatActivity() {
                 timeCreated = System.currentTimeMillis() / 1000,
                 startTime = startTime,
                 endTime = endTime,
-                address = choosenPlace?.address?.toString())
+                address = choosenPlace?.address?.toString(),
+                rating = 0.0)
 
         postEvent(event)
     }
