@@ -38,7 +38,7 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
             }
         }
 
-        var googleMapRef: WeakReference<GoogleMap>? = null
+        var googleMapRef: GoogleMap? = null
         var eventsListFragmentRef: WeakReference<EventsListFragment>? = null
         var myEventsListFragmentRef: WeakReference<MyEventsListFragment>? = null
     }
@@ -48,7 +48,7 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
             0 -> {
                 val supportMapFragment: SupportMapFragment = SupportMapFragment.newInstance()
                 supportMapFragment.getMapAsync { googleMap ->
-                    googleMapRef = WeakReference(googleMap)
+                    googleMapRef = googleMap
                     addEventsToMap(googleMap)
 
                     googleMap.setOnMarkerClickListener { marker ->
@@ -120,8 +120,8 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
 
     fun refreshEvents() {
         //TODO: Remove events from map
-        if (googleMapRef != null && googleMapRef!!.get() != null) {
-            addEventsToMap(googleMapRef!!.get())
+        if (googleMapRef != null) {
+            addEventsToMap(googleMapRef)
         }
 
         if (eventsListFragmentRef != null && eventsListFragmentRef!!.get() != null) {

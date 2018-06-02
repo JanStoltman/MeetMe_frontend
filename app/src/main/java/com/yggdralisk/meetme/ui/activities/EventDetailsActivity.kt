@@ -115,8 +115,9 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
 
-                AlertDialog.Builder(applicationContext).setMessage("Are you sure?").setPositiveButton("Yes", deleteDialogListener)
-                        .setNegativeButton("No", deleteDialogListener).show()
+                AlertDialog.Builder(this).setMessage("Are you sure?").setPositiveButton("Yes", deleteDialogListener)
+                        .setNegativeButton("No", deleteDialogListener)
+                        .show()
             })
         } else if (MyApplication.userId in eventToDisplay?.guests ?: listOf()) {
             joinButton.text = getString(R.string.leave_event)
