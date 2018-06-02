@@ -16,14 +16,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
         android:id="@+id/addEventButton"
-        android:foreground="@drawable/ic_add_circle_outline_white_24dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="64dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_add_circle_outline_white_24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/profileButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/ic_face_white_48dp"
+        android:clickable="true"
+        app:layout_constraintBottom_toTopOf="@+id/addEventButton"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"

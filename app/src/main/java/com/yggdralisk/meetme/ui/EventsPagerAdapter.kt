@@ -18,7 +18,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.fragments.EventsListFragment
 import com.yggdralisk.meetme.ui.fragments.MyEventsListFragment
-import com.yggdralisk.meetme.ui.fragments.UserProfileFragment
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
 import java.lang.ref.WeakReference
 
@@ -29,6 +28,9 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
     companion object {
         const val PAGES_COUNT = 3 //Map, List, UserPage
         const val ONE_SECOND_MILIS: Long = 2000L
+        const val INITIAL_LATITUDE: Double = 51.108081
+        const val INITIAL_LONGITUDE: Double = 17.065134
+        const val INITIAL_MAP_ZOOM: Float = 10f
         private var markerId: String? = null
         private val countDownTimer = object : CountDownTimer(ONE_SECOND_MILIS, ONE_SECOND_MILIS) {
             override fun onTick(millisUntilFinished: Long) {}
@@ -64,18 +66,11 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
                         }
                     }
 
-                    googleMap.setMinZoomPreference(14f)
+                    googleMap.isMyLocationEnabled = (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+                            == PackageManager.PERMISSION_GRANTED)
 
-                    if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        googleMap.isMyLocationEnabled = true
-
-                        val sydney = LatLng(51.108081, 17.065134)
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-                    } else {
-                        val sydney = LatLng(51.108081, 17.065134)
-                        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-                    }
+                    val latLng = LatLng(INITIAL_LATITUDE, INITIAL_LONGITUDE)
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, INITIAL_MAP_ZOOM))
                 }
 
                 return supportMapFragment

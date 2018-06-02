@@ -45,17 +45,11 @@ class MyEventsListFragment : Fragment() {
             view.findViewById<SwipeRefreshLayout>(R.id.refreshLayout).isRefreshing = false
         }
 
-        view?.findViewById<ImageButton>(R.id.profileButton)?.setOnClickListener({
-            val intent = Intent(context, UserDataFillActivity::class.java)
-            //intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-        })
-
         return view
     }
 
     class MyEventsAdapter(context: Context, provider: EventsListProviderInterface)
-        : AbstractEventsListAdapter(context, provider) {
+        :   AbstractEventsListAdapter(context, provider) {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val event = provider.getMyEvents().getOrNull(position)

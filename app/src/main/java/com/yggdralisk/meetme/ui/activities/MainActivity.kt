@@ -38,12 +38,21 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         addEventButton.setOnClickListener({
             startAddEventActivity()
         })
+
+        profileButton.setOnClickListener({
+            startUserDataFillActivity()
+        })
     }
 
     override fun onResume() {
         super.onResume()
         callEvents()
         callMyEvents()
+    }
+
+    private fun startUserDataFillActivity() {
+        val intent = Intent(this, UserDataFillActivity::class.java)
+        startActivity(intent)
     }
 
     private fun startAddEventActivity() {
@@ -88,8 +97,8 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
     }
 
     private fun setupTabIcons() {
-        tabLayout.getTabAt(0)?.setIcon(R.drawable.ic_map_white_24dp);
-        tabLayout.getTabAt(1)?.setIcon(R.drawable.ic_list_white_24dp);
-        tabLayout.getTabAt(2)?.setIcon(R.drawable.ic_face_white_24dp);
+        tabLayout.getTabAt(0)?.setIcon(R.drawable.ic_map_white_24dp)
+        tabLayout.getTabAt(1)?.setIcon(R.drawable.ic_list_white_24dp)
+        tabLayout.getTabAt(2)?.setIcon(R.drawable.ic_person_white)
     }
 }
