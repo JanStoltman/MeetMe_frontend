@@ -48,8 +48,7 @@ class MyIntentService(name: String) : IntentService(name){
         val notification = NotificationCompat.Builder(this, NotificationHelper.EVENT_REMINDER_CHANNEL)
                 .setContentTitle(title)
                 .setContentText(content)
-                //TODO change icon
-                .setSmallIcon(R.drawable.ic_add_circle_outline_white_24dp)
+                .setSmallIcon(R.mipmap.ic_launcher)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
                 //uncomment to enable navigation to event
