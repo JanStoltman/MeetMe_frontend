@@ -12,7 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import com.yggdralisk.meetme.R
-import com.yggdralisk.meetme.ui.EventsListAdapter
+import com.yggdralisk.meetme.ui.AbstractEventsListAdapter
 import com.yggdralisk.meetme.ui.activities.UserDataFillActivity
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
 import com.yggdralisk.meetme.utility.TimestampManager
@@ -55,12 +55,12 @@ class MyEventsListFragment : Fragment() {
     }
 
     class MyEventsAdapter(context: Context, provider: EventsListProviderInterface)
-        : EventsListAdapter(context, provider) {
+        : AbstractEventsListAdapter(context, provider) {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            super.onBindViewHolder(holder, position)
+            val event = provider.getMyEvents().getOrNull(position)
 
-            val event = provider.getEvents().getOrNull(position)
+            bindEvent(event, holder)
             event?.let {
                 val manager = TimestampManager(context)
                 when {

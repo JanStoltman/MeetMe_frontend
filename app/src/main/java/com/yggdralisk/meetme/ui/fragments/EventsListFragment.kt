@@ -1,7 +1,6 @@
 package com.yggdralisk.meetme.ui.fragments
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.widget.SwipeRefreshLayout
@@ -10,12 +9,10 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import com.yggdralisk.meetme.R
-import com.yggdralisk.meetme.ui.EventsListAdapter
-import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
-import com.yggdralisk.meetme.ui.activities.EventDetailsActivity.Companion.EVENT_ID
+import com.yggdralisk.meetme.ui.AbstractEventsListAdapter
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
+import com.yggdralisk.meetme.utility.TimestampManager
 import kotlinx.android.synthetic.main.events_list_frgment.*
 
 /**
@@ -36,7 +33,7 @@ class EventsListFragment : Fragment() {
 
         if(context != null && provider != null){
             recyclerView?.layoutManager = LinearLayoutManager(context)
-            recyclerView?.adapter = EventsListAdapter(context!!, provider!!)
+            recyclerView?.adapter = EventsAdapter(context!!, provider!!)
         }
 
         view?.findViewById<SwipeRefreshLayout>(R.id.refreshLayout)?.setOnRefreshListener {
@@ -46,6 +43,19 @@ class EventsListFragment : Fragment() {
         }
 
         return view
+    }
+
+    class EventsAdapter(context: Context, provider: EventsListProviderInterface)
+        : AbstractEventsListAdapter(context, provider) {
+
+        override fun onBindViewHolder(holder: AbstractEventsListAdapter.ViewHolder, position: Int) {
+            val event = Companion.provider?.getEvents()?.getOrNull(position)
+            bindEvent(event, holder)
+        }
+
+        override fun getItemCount(): Int {
+            return provider.getEvents().size
+        }
     }
 
     fun refreshEvents() {
