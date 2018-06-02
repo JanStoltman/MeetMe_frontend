@@ -142,14 +142,4 @@
         app:layout_constraintHorizontal_bias="0.448"
         app:layout_constraintStart_toEndOf="@+id/phoneLayout"
         app:layout_constraintTop_toBottomOf="@+id/surnameLayout" />
-
-    <ImageButton
-        android:id="@+id/facebookButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/com_facebook_button_icon"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/bioLayout" />
 </android.support.constraint.ConstraintLayout>

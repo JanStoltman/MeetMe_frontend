@@ -53,7 +53,7 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
     }
 
     private fun castAndSortEventsBody(response: Response<List<EventModel>>) =
-            response.body().orEmpty().sortedWith(compareBy(EventModel::startTime, EventModel::endTime))
+            response.body().orEmpty().sortedWith(compareBy(EventModel::endTime, EventModel::startTime))
 
     override fun callEvents() {
         EventCalls.getEvents(object : MyCallback<List<EventModel>>(this) {

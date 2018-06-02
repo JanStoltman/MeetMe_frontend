@@ -13,5 +13,6 @@ data class UserModel(@SerializedName("Id") var id: Int?,
                      @SerializedName("PhoneNumber") var phoneNumber: String?,
                      @SerializedName("Description") var bio: String?,
                      @SerializedName("PhotoURL") var photoImage: String?,
-                     @SerializedName("Rating") var rating: Double?
+                     @SerializedName("Rating") var rating: Double?,
+                     @SerializedName("FacebookURL") var String: String?
 )

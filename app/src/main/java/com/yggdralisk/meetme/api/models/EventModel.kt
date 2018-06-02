@@ -22,5 +22,6 @@ data class EventModel(
         @SerializedName("LocationName") var locationName: String?,
         @SerializedName("Description") var description: String?,
         @SerializedName("GoogleMapsURL") var googleMapsURL: String?,
-        @SerializedName("Address") var address: String?
+        @SerializedName("Address") var address: String?,
+        @SerializedName("Rating") var rating: Double?
 )

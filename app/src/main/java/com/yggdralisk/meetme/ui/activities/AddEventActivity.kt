@@ -102,7 +102,7 @@ class AddEventActivity : AppCompatActivity() {
         startCalendar.set(Calendar.YEAR, chosenYear.toInt())
         startCalendar.set(Calendar.YEAR, chosenYear.toInt())
 
-        return endCalendar.timeInMillis > startCalendar.timeInMillis ||
+        return endCalendar.timeInMillis <= startCalendar.timeInMillis ||
                 descriptionEdit.text.isNullOrBlank() ||
                 guestLimit.text.isNullOrBlank() ||
                 eventNameEdit.text.isNullOrBlank() ||
