@@ -12,6 +12,12 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.UserModel
 import retrofit2.Call
 import retrofit2.Response
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.content.pm.ApplicationInfo
+import android.net.Uri
+import kotlinx.android.synthetic.main.activity_user_profile.*
+
 
 class UserProfileActivity : AppCompatActivity() {
     companion object {
@@ -46,4 +52,5 @@ class UserProfileActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.bioTextView)?.text = user?.bio
         findViewById<TextView>(R.id.userRating).setText(String.format("%.2f", user?.rating))
     }
+
 }

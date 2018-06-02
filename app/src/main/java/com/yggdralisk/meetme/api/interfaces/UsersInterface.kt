@@ -8,8 +8,6 @@ import retrofit2.http.*
 
 /**
  * Created by Jan Stoltman on 4/7/18.
- * Login flow:
- *
  */
 interface UsersInterface {
     @POST("/api/Users/Register")

@@ -52,12 +52,15 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
         startActivity(intent)
     }
 
+    private fun castAndSortEventsBody(response: Response<List<EventModel>>) =
+            response.body().orEmpty().sortedWith(compareBy(EventModel::endTime, EventModel::startTime))
+
     override fun callEvents() {
         EventCalls.getEvents(object : MyCallback<List<EventModel>>(this) {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
-                if (response != null && response.isSuccessful && response.body() != null) {
+                if (response != null && response.isSuccessful) {
                     events.clear()
-                    events.addAll(response.body() as List<EventModel>)
+                    events.addAll(castAndSortEventsBody(response))
                     pagerAdapter?.refreshEvents()
                 }
             }
@@ -67,9 +70,9 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
     override fun callMyEvents() {
         EventCalls.getMyEvents(object : MyCallback<List<EventModel>>(this) {
             override fun onResponse(call: Call<List<EventModel>>?, response: Response<List<EventModel>>?) {
-                if (response != null && response.isSuccessful && response.body() != null) {
+                if (response != null && response.isSuccessful) {
                     myEvents.clear()
-                    myEvents.addAll(response.body() as List<EventModel>)
+                    myEvents.addAll(castAndSortEventsBody(response))
                     pagerAdapter?.refreshEvents()
                 }
             }

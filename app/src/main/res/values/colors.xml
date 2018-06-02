@@ -8,4 +8,6 @@
     <color name="colorAccent">#40dfff</color>
     <color name="loadingSpinner">#303F9F</color>
     <color name="transparent">#00000000</color>
+    <color name="yellow">#fcfc76</color>
+    <color name="grey">#696969</color>
 </resources>
