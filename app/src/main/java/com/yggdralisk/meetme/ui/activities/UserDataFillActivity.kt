@@ -18,7 +18,6 @@ import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.UserModel
 import com.yggdralisk.meetme.utility.FBProfileDataHelper
 import kotlinx.android.synthetic.main.activity_user_data_fill.*
-import kotlinx.android.synthetic.main.events_list_frgment.*
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
@@ -35,7 +34,7 @@ class UserDataFillActivity : AppCompatActivity() {
         val user = MyApplication.currentUser
         //check if user has all obligatory fields filled, if not - get data from facebook
         if(user?.name.isNullOrBlank() || user?.surname.isNullOrBlank() || user?.email.isNullOrBlank()){
-            mergeWithFaceboookData()
+            downloadFbDataAndMerge()
         }
 
         setListeners()
@@ -51,7 +50,7 @@ class UserDataFillActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.fbButton)?.setOnClickListener {
-            replaceWithFaceboookData()
+            downloadFbDataAndReplace()
         }
     }
 
@@ -97,10 +96,10 @@ class UserDataFillActivity : AppCompatActivity() {
             user?.bio = findViewById<EditText>(R.id.bioTextView)?.text.toString()
 
             user?.let {
-                if(dataIsValid(user)){
+                if(isUserDataValid(it)){
                     progressBar.visibility = View.VISIBLE
 
-                    UsersCalls.updateMyData(user, object : MyCallback<ResponseBody>(this) {
+                    UsersCalls.updateMyData(it, object : MyCallback<ResponseBody>(this) {
                         override fun onResponse(call: Call<ResponseBody>?, response: Response<ResponseBody>?) {
                             super.onResponse(call, response)
                             progressBar.visibility = View.GONE
@@ -170,7 +169,7 @@ class UserDataFillActivity : AppCompatActivity() {
 
     }
 
-    private fun replaceWithFaceboookData(){
+    private fun downloadFbDataAndReplace(){
         progressBar.visibility = View.VISIBLE
         FBProfileDataHelper.getFbData(GraphRequest.GraphJSONObjectCallback({ jsonObject, response ->
             val fbDataBundle = FBProfileDataHelper.jsonToBundle(jsonObject)
@@ -180,7 +179,7 @@ class UserDataFillActivity : AppCompatActivity() {
         }))
     }
 
-    private fun mergeWithFaceboookData(){
+    private fun downloadFbDataAndMerge(){
         progressBar.visibility = View.VISIBLE
         FBProfileDataHelper.getFbData(GraphRequest.GraphJSONObjectCallback({ jsonObject, response ->
             val fbDataBundle = FBProfileDataHelper.jsonToBundle(jsonObject)
@@ -190,7 +189,7 @@ class UserDataFillActivity : AppCompatActivity() {
         }))
     }
 
-    private fun dataIsValid(user: UserModel): Boolean{
+    private fun isUserDataValid(user: UserModel): Boolean{
         if(user.name.isNullOrBlank()){
             Toast.makeText(this, getString(R.string.user_name_empty), Toast.LENGTH_SHORT).show()
             return false
@@ -199,14 +198,14 @@ class UserDataFillActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.user_surname_empty), Toast.LENGTH_SHORT).show()
             return false
         }
-        else if(!isValidEmail(user.email)){
+        else if(!isEmailValid(user.email)){
             Toast.makeText(this, getString(R.string.user_email_invalid), Toast.LENGTH_SHORT).show()
             return false
         }
         return true
     }
 
-    fun isValidEmail(string: String?): Boolean{
+    private fun isEmailValid(string: String?): Boolean{
         return !string.isNullOrBlank() && Patterns.EMAIL_ADDRESS.matcher(string).matches()
     }
 

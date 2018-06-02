@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -19,6 +20,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.nostra13.universalimageloader.core.ImageLoader
 import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
@@ -49,33 +51,38 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         val eventId = intent.getIntExtra(EVENT_ID, 1) //TODO: Change this shit
 
+        progressBar2.visibility = View.VISIBLE
+
+        callEvent(eventId)
+    }
+
+    private fun callEvent(eventId: Int) {
         EventCalls.getEventById(eventId, object : MyCallback<EventModel>(this) {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
+                progressBar2.visibility = View.GONE
 
                 eventToDisplay?.let {
-                    if(eventEnded(it)){
+                    if (eventEnded(it)) {
                         checkIfNotRatedYet(eventId)
-                    }
-                    else{
+                    } else {
                         setEvent()
                     }
                 }
             }
         })
-
-
     }
 
     private fun checkIfNotRatedYet(eventId: Int) {
+        progressBar2.visibility = View.VISIBLE
         EventCalls.wasRated(eventId, object : MyCallback<Boolean>(this@EventDetailsActivity) {
             override fun onResponse(call: Call<Boolean>?, response: Response<Boolean>?) {
                 super.onResponse(call, response)
+                progressBar2.visibility = View.GONE
                 response?.body()?.let {
                     canRateEvent = !it
                 }
-
                 setEvent()
             }
         })
@@ -83,7 +90,10 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun eventEnded(event: EventModel): Boolean {
         val timestampManager = TimestampManager(this)
-        return event.endTime == null && timestampManager.isTimestampInPast(event.endTime!!)
+        event.endTime?.let {
+            return timestampManager.isTimestampInPast(it)
+        }
+        return false
     }
 
     private fun setEvent() {
@@ -257,6 +267,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val currentItem = getItem(position) as SimpleUserModel
             view?.findViewById<TextView>(R.id.userName)?.text = "${currentItem.firstName} ${currentItem.lastName}"
+            ImageLoader.getInstance().displayImage(currentItem.photoImage, view?.findViewById<ImageView>(R.id.profilePic))
 
             view?.setOnClickListener {
                 val intent = Intent(context, UserProfileActivity::class.java)

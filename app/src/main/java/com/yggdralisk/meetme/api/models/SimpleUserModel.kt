@@ -8,5 +8,6 @@ import com.google.gson.annotations.SerializedName
 data class SimpleUserModel(
         @SerializedName("Id")val id: Int,
         @SerializedName("FirstName") val firstName: String,
-        @SerializedName("LastName") val lastName: String
+        @SerializedName("LastName") val lastName: String,
+        @SerializedName("PhotoURL") val photoImage: String
 )

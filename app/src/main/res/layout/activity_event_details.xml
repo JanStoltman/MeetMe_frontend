@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     tools:context="com.yggdralisk.meetme.ui.activities.EventDetailsActivity">
 
+    <ProgressBar
+        android:id="@+id/progressBar2"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/eventName"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:visibility="gone" />
+
     <TextView
         android:id="@+id/eventName"
         android:layout_width="wrap_content"

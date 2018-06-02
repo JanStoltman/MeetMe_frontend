@@ -36,7 +36,10 @@ class MyIntentService(name: String) : IntentService(name){
 
     fun createNotification(eventModel: EventModel){
         val title = eventModel.name + " starts soon"
-        val content = eventModel.name + " starts in 1h at " + eventModel.locationName
+        var content = ""
+        if(!eventModel.locationName.isNullOrBlank()){
+            content = eventModel.name + " starts soon at " + eventModel.locationName
+        }
 
         val intent = Intent(this, EventDetailsActivity::class.java)
         intent.putExtra(EventDetailsActivity.EVENT_ID, eventModel.id)
@@ -48,8 +51,10 @@ class MyIntentService(name: String) : IntentService(name){
                 //TODO change icon
                 .setSmallIcon(R.drawable.ic_add_circle_outline_white_24dp)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+
                 //uncomment to enable navigation to event
                 //.setContentIntent(pendingIntent)
+
                 .setAutoCancel(true)
                 .build()
 

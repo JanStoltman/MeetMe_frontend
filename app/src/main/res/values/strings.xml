@@ -32,7 +32,7 @@
     <string name="your_event">It\'s your event!</string>
     <string name="profile">profile</string>
     <string name="cancel_event">Cancel event</string>
-    <string name="user_name_empty">Please fill your name</string>
-    <string name="user_surname_empty">Please fill your surname</string>
+    <string name="user_name_empty">Fill your name</string>
+    <string name="user_surname_empty">Fill your surname</string>
     <string name="user_email_invalid">Email is invalid</string>
 </resources>
