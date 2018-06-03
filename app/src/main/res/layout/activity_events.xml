@@ -33,7 +33,7 @@
         android:layout_marginStart="16dp"
         android:src="@drawable/ic_profile"
         android:clickable="true"
-        android:backgroundTint="@color/white"
+        app:backgroundTint="@color/white"
 
         app:layout_constraintBottom_toTopOf="@+id/addEventButton"
         app:layout_constraintStart_toStartOf="parent" />

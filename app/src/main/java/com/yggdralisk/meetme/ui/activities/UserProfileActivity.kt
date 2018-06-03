@@ -15,7 +15,13 @@ import retrofit2.Response
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ApplicationInfo
+import android.graphics.Bitmap
 import android.net.Uri
+import android.view.View
+import com.nostra13.universalimageloader.core.DisplayImageOptions
+import com.nostra13.universalimageloader.core.assist.FailReason
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener
+import com.nostra13.universalimageloader.core.listener.ImageLoadingProgressListener
 import kotlinx.android.synthetic.main.activity_user_profile.*
 
 
@@ -41,16 +47,40 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun bindData(user: UserModel?) {
-        if (!user?.photoImage.isNullOrBlank()) {
-            ImageLoader.getInstance().displayImage(user?.photoImage, findViewById<ImageView>(R.id.imageView))
-        }
-        findViewById<TextView>(R.id.nameTextView)?.text = user?.name
-        findViewById<TextView>(R.id.surnameTextView)?.text = user?.surname
+        loadImage(user)
+        findViewById<TextView>(R.id.nameTextView)?.text = user?.name + " " + user?.surname
         findViewById<TextView>(R.id.emailTextView)?.text = user?.email
         findViewById<TextView>(R.id.phoneTextView)?.text = user?.phoneNumber
         //findViewById<TextView>(R.id.birthdateTextView)?.setText(user?.birthDay.toString())
         findViewById<TextView>(R.id.bioTextView)?.text = user?.bio
         findViewById<TextView>(R.id.userRating).setText(String.format("%.2f", user?.rating))
+    }
+
+    private fun loadImage(user: UserModel?){
+
+        if (!user?.photoImage.isNullOrBlank()) {
+            ImageLoader.getInstance().displayImage(
+                    user?.photoImage,
+                    findViewById<ImageView>(R.id.imageView),
+                    object : ImageLoadingListener{
+                        override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
+                            imageProgressBar.visibility = View.GONE
+                        }
+
+                        override fun onLoadingStarted(imageUri: String?, view: View?) {
+                            imageProgressBar.visibility = View.VISIBLE
+                        }
+
+                        override fun onLoadingCancelled(imageUri: String?, view: View?) {
+                            imageProgressBar.visibility = View.GONE
+                        }
+
+                        override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
+                            imageProgressBar.visibility = View.GONE
+                        }
+                    }
+            )
+        }
     }
 
 }
