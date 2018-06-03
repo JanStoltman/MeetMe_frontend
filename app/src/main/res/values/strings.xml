@@ -8,7 +8,7 @@
     <string name="map_page_title">Events map</string>
     <string name="events_list_page_title">Events list</string>
     <string name="user_profile_page_title">Your profile</string>
-    <string name="save_changes">Save changes</string>
+    <string name="save_changes">Save</string>
     <string name="name">Name</string>
     <string name="surname">Surname</string>
     <string name="email">Email</string>
@@ -35,4 +35,6 @@
     <string name="user_name_empty">Fill your name</string>
     <string name="user_surname_empty">Fill your surname</string>
     <string name="user_email_invalid">Email is invalid</string>
+    <string name="get_facebook_data">Get Facebook data</string>
+    <string name="rating">Rating</string>
 </resources>

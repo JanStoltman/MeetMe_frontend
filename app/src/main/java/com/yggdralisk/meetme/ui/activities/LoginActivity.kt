@@ -106,7 +106,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun registerUser() {
         if (AccessToken.getCurrentAccessToken() != null) {
-            Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().userId}", Toast.LENGTH_LONG).show()
+            //Toast.makeText(this, "Token: ${AccessToken.getCurrentAccessToken().userId}", Toast.LENGTH_LONG).show()
             UsersCalls.registerUser(hashMapOf(Pair("Token", AccessToken.getCurrentAccessToken().userId)),
                     object : MyCallback<Int>(this) {
                         override fun onResponse(call: Call<Int>?, response: Response<Int>?) {
