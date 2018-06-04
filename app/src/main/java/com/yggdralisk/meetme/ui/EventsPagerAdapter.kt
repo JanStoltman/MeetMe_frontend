@@ -56,7 +56,8 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
                     googleMap.setOnMarkerClickListener { marker ->
                         if (markerId == marker.id) {
                             val intent = Intent(context, EventDetailsActivity::class.java)
-                            intent.putExtra(EventDetailsActivity.EVENT_ID, marker.title.split(" ")[0].toInt())
+                            val eventId = marker?.tag as Int
+                            intent.putExtra(EventDetailsActivity.EVENT_ID, eventId)
                             context.startActivity(intent)
                             true
                         } else {
@@ -64,6 +65,13 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
                             countDownTimer.start()
                             false
                         }
+                    }
+
+                    googleMap.setOnInfoWindowClickListener { marker ->
+                        val intent = Intent(context, EventDetailsActivity::class.java)
+                        val eventId = marker?.tag as Int
+                        intent.putExtra(EventDetailsActivity.EVENT_ID, eventId)
+                        context.startActivity(intent)
                     }
 
                     googleMap.isMyLocationEnabled = (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -92,16 +100,18 @@ class EventsPagerAdapter(fm: FragmentManager, private val context: Context, priv
 
         for (event in provider.getEvents()) {
             val pos = LatLng(event.latitude!!, event.longitude!!) //TODO: check if lat/lon is null and throw error if true
-            val marker: MarkerOptions = MarkerOptions()
+            val markerOptions: MarkerOptions = MarkerOptions()
                     .position(pos)
-                    .title(String.format("%d .%s", event.id, event.name))
-                    .snippet(String.format("%d - %d", event.ageRestriction?.minAge, event.ageRestriction?.maxAge))
+                    .title(String.format("%s", event.name))
+                    .snippet(String.format("%d / %d", event.guests?.size, event.guestLimit))
 
             if (event.guestLimit == null || event.guests == null || event.guestLimit!! > event.guests!!.size) {
-                marker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
             }
 
-            googleMap?.addMarker(marker)
+
+            val marker = googleMap?.addMarker(markerOptions)
+            marker?.tag = event.id
         }
     }
 
