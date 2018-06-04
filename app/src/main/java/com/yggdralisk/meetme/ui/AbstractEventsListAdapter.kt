@@ -8,9 +8,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.yggdralisk.meetme.R
+import com.yggdralisk.meetme.R.id.creatorName
+import com.yggdralisk.meetme.api.MyCallback
+import com.yggdralisk.meetme.api.calls.UsersCalls
 import com.yggdralisk.meetme.api.models.EventModel
+import com.yggdralisk.meetme.api.models.UserModel
 import com.yggdralisk.meetme.ui.activities.EventDetailsActivity
 import com.yggdralisk.meetme.ui.interfaces.EventsListProviderInterface
+import retrofit2.Call
+import retrofit2.Response
 
 /**
  * Created by Jan Stoltman on 6/1/18.
@@ -38,11 +44,26 @@ abstract class AbstractEventsListAdapter(val context: Context, val provider: Eve
                 holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
             }
 
+            event.creator?.let {
+                getCreator(holder, it)
+            }
+
+
             holder.rowView.setOnClickListener({
                 val intent = Intent(context, EventDetailsActivity::class.java)
                 intent.putExtra(EventDetailsActivity.EVENT_ID, event.id)
                 context.startActivity(intent)
             })
         }
+    }
+
+    private fun getCreator(holder: ViewHolder, creatorId: Int) {
+        UsersCalls.getUserById(creatorId, object : MyCallback<UserModel>(context) {
+            override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
+                super.onResponse(call, response)
+                holder.rowView.findViewById<TextView>(R.id.creatorName)?.text = "${response?.body()?.name ?: "Error"} ${response?.body()?.surname
+                        ?: "Error"}"
+            }
+        })
     }
 }
