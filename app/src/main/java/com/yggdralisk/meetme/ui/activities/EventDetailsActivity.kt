@@ -226,7 +226,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         getCreator()
 
         val ageRestriction = eventToDisplay?.ageRestriction
-        ageRestrictions.text = "Age: min.${ageRestriction?.minAge} max.${ageRestriction?.maxAge}"
+        ageRestrictions.text = "min.${ageRestriction?.minAge} max.${ageRestriction?.maxAge}"
 
         guestsList.adapter = MyAdapter(eventGuests, this)
         getGuests()
