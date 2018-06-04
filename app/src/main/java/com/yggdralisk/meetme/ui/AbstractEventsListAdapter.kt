@@ -32,7 +32,7 @@ abstract class AbstractEventsListAdapter(val context: Context, val provider: Eve
             holder.rowView.findViewById<TextView>(R.id.placeName)?.text = event.locationName
             holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.text = String.format("%d/%d", event.guests?.size
                     ?: 0+1, event.guestLimit ?: 0+1)
-            holder.rowView.findViewById<TextView>(R.id.eventRating)?.text = if (event.rating == 0.0) "" else event.rating.toString()
+            holder.rowView.findViewById<TextView>(R.id.eventRating)?.text = ""
 
             if (event.guestLimit == null || event.guestLimit ?: 1 > event.guests?.size ?: 0) {
                 holder.rowView.findViewById<TextView>(R.id.takenToMaxPlaces)?.setTextColor(context.resources.getColor(R.color.colorAccent))
