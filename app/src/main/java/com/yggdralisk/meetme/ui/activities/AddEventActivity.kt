@@ -122,7 +122,7 @@ class AddEventActivity : AppCompatActivity() {
                 creator = MyApplication.userId,
                 description = descriptionEdit.text.toString(),
                 guestLimit = guestLimit.text.toString().toInt(),
-                eventType = if (privateButton.isChecked) EventType.PRIVATE else EventType.PUBLIC,
+                eventType = EventType.PUBLIC,
                 guests = listOf(),
                 googleMapsURL = choosenPlace?.address?.toString() ?: "",
                 latitude = choosenPlace?.latLng?.latitude ?: 0.0,
@@ -156,8 +156,8 @@ class AddEventActivity : AppCompatActivity() {
             if (resultCode == Activity.RESULT_OK) {
                 data?.let {
                     val place = PlacePicker.getPlace(data, this)
-                    val toastMsg = String.format("Place: %s", place.name)
-                    Toast.makeText(baseContext, toastMsg, Toast.LENGTH_SHORT).show()
+                   // val toastMsg = String.format("Place: %s", place.name)
+                    //Toast.makeText(baseContext, toastMsg, Toast.LENGTH_SHORT).show()
                     choosenPlace = place
                     locationNameEdit.text = place.name
                 }
@@ -179,7 +179,7 @@ class AddEventActivity : AppCompatActivity() {
         }
 
         override fun onTimeSet(view: TimePicker, hourOfDay: Int, minute: Int) {
-            Toast.makeText(context, "$hourOfDay : $minute", Toast.LENGTH_SHORT).show()
+            //Toast.makeText(context, "$hourOfDay : $minute", Toast.LENGTH_SHORT).show()
             if (isEnd) {
                 chosenMinuteEnd = if (minute > 9) "$minute" else "0$minute"
                 chosenHourEnd = "$hourOfDay"
@@ -204,7 +204,7 @@ class AddEventActivity : AppCompatActivity() {
         }
 
         override fun onDateSet(view: DatePicker, year: Int, month: Int, day: Int) {
-            Toast.makeText(context, "$year . $month . $day", Toast.LENGTH_SHORT).show()
+           // Toast.makeText(context, "$year . $month . $day", Toast.LENGTH_SHORT).show()
             if (isEnd) {
                 chosenYearEnd = "$year"
                 chosenMonthEnd = "${month + 1}"

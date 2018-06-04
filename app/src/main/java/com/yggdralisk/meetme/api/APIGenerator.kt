@@ -7,17 +7,24 @@ import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by Jan Stoltman on 4/7/18.
  */
 class APIGenerator {
     companion object {
-        const val BASE_URL: String = "http://zpimeetme.azurewebsites.net"
+        private const val BASE_URL: String = "http://zpimeetme.azurewebsites.net"
+
+        private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
+                .readTimeout(1, TimeUnit.MINUTES)
+                .connectTimeout(1, TimeUnit.MINUTES)
+                .build()
 
         private val builder: Retrofit.Builder = Retrofit
                 .Builder()
                 .baseUrl(BASE_URL)
+                .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
 
         private var retrofit: Retrofit = builder.build()

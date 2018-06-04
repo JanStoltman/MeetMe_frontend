@@ -61,8 +61,6 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
                 super.onResponse(call, response)
                 eventToDisplay = response?.body()
-                progressBar2.visibility = View.GONE
-
                 eventToDisplay?.let {
                     if (eventEnded(it)) {
                         checkIfNotRatedYet(eventId)
@@ -70,6 +68,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                         setEvent()
                     }
                 }
+
+                progressBar2.visibility = View.GONE
             }
         })
     }
@@ -100,7 +100,9 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         popoulateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
 
-        if (MyApplication.userId == eventToDisplay?.creator ?: true) {
+        if (eventToDisplay != null && eventEnded(eventToDisplay!!)) {
+            joinButton.visibility = View.INVISIBLE
+        } else if (MyApplication.userId == eventToDisplay?.creator ?: true) {
             joinButton.text = getString(R.string.cancel_event)
             joinButton.setBackgroundColor(Color.RED)
             joinButton.setOnClickListener({
@@ -124,22 +126,19 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             joinButton.setOnClickListener({
                 leaveEvent()
             })
-
-            if(canRateEvent){
-                ratingBar.visibility = View.VISIBLE
-                rateButton.visibility = View.VISIBLE
-                rateButton.setOnClickListener({
-                    rateEvent()
-                })
-            }
-
-
-
         } else if (eventToDisplay?.guestLimit ?: 4 <= eventToDisplay?.guests?.size ?: 1) {
             joinButton.text = this.getText(R.string.event_full)
         } else {
             joinButton.setOnClickListener({
                 joinEvent()
+            })
+        }
+
+        if (canRateEvent) {
+            ratingBar.visibility = View.VISIBLE
+            rateButton.visibility = View.VISIBLE
+            rateButton.setOnClickListener({
+                rateEvent()
             })
         }
     }

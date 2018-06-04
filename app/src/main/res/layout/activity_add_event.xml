@@ -55,16 +55,6 @@
         app:layout_constraintStart_toEndOf="@+id/minAge"
         app:layout_constraintTop_toTopOf="@+id/minAge" />
 
-    <ToggleButton
-        android:id="@+id/privateButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:textOff="Public"
-        android:textOn="Private"
-        app:layout_constraintStart_toEndOf="@+id/timeButton"
-        app:layout_constraintTop_toBottomOf="@+id/textView2" />
-
     <EditText
         android:id="@+id/eventNameEdit"
         android:layout_width="wrap_content"
@@ -94,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:src="@drawable/ic_date_picker"
-        app:layout_constraintBottom_toBottomOf="@+id/privateButton"
+        app:layout_constraintBottom_toBottomOf="@+id/timeButton"
         app:layout_constraintStart_toEndOf="@+id/googleMapsButton" />
 
     <ImageButton
@@ -103,8 +93,8 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:src="@drawable/ic_clock"
-        app:layout_constraintBottom_toBottomOf="@+id/privateButton"
-        app:layout_constraintStart_toEndOf="@+id/calendarButton" />
+        app:layout_constraintStart_toEndOf="@+id/calendarButton"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <ImageButton
         android:id="@+id/calendarButtonEnd"

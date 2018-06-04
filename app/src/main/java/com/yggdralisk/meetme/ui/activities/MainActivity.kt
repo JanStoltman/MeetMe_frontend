@@ -82,6 +82,7 @@ class MainActivity : FragmentActivity(), EventsListProviderInterface {
                 if (response != null && response.isSuccessful) {
                     myEvents.clear()
                     myEvents.addAll(castAndSortEventsBody(response))
+
                     pagerAdapter?.refreshEvents()
                 }
             }
