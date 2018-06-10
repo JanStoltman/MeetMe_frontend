@@ -3,13 +3,17 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
+import android.support.v4.content.FileProvider
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
@@ -34,11 +38,19 @@ import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import kotlinx.android.synthetic.main.activity_event_details.*
 import retrofit2.Call
 import retrofit2.Response
+import java.io.File
+import java.io.IOException
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
         const val EVENT_ID = "event_id"
+        const val PHOTO_REQUEST = 1
+        const val FILE_PROVIDER_AUTHORITY_NAME: String = "com.yggdralisk.meetme.fileprovider"
+
+        var mCurrentPhotoPath: String = ""
     }
 
     var eventToDisplay: EventModel? = null
@@ -54,6 +66,52 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         progressBar2.visibility = View.VISIBLE
 
         callEvent(eventId)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.event_details_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean = when (item?.itemId ?: 0) {
+        R.id.menuCameraButton -> {
+            dispatchTakePhotoIntent()
+            true
+        }
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun createImageFile(): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
+        val imageFileName = "JPEG_" + timeStamp + "_"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        val image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        )
+
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private fun dispatchTakePhotoIntent() {
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(packageManager) != null) {
+            var photoFile: File? = null;
+            try {
+                photoFile = createImageFile();
+            } catch (ex: IOException) {
+                ex.printStackTrace()
+            }
+
+            if (photoFile != null) {
+                val photoURI: Uri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY_NAME, photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, PHOTO_REQUEST);
+            }
+        }
+
     }
 
     private fun callEvent(eventId: Int) {
@@ -97,7 +155,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setEvent() {
-        popoulateUI()
+        populateUI()
         (mapView as SupportMapFragment).getMapAsync(this)
 
         if (eventToDisplay != null && eventEnded(eventToDisplay!!)) {
@@ -210,7 +268,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap?.moveCamera(CameraUpdateFactory.newLatLng(pos))
     }
 
-    private fun popoulateUI() {
+    private fun populateUI() {
         eventName.text = eventToDisplay?.name ?: ""
         locationName.text = eventToDisplay?.locationName ?: ""
         eventDescription.text = eventToDisplay?.description ?: ""
@@ -222,16 +280,36 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         endTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.endTime ?: 0)
         locationAddress.text = eventToDisplay?.address ?: ""
 
-        getCreator()
+        fetchCreator()
 
         val ageRestriction = eventToDisplay?.ageRestriction
         ageRestrictions.text = "min.${ageRestriction?.minAge} max.${ageRestriction?.maxAge}"
 
         guestsList.adapter = MyAdapter(eventGuests, this)
-        getGuests()
+        fetchGuests()
     }
 
-    private fun getGuests() {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK && data != null) {
+            val extras = data.getExtras();
+            val imageBitmap = extras.get("data") as Bitmap
+            processTakenPhoto(imageBitmap)
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun processTakenPhoto(imageBitmap: Bitmap) {
+        val bmOptions: BitmapFactory.Options = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+
+        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
+        //TODO: Send to api/test display
+    }
+
+
+    private fun fetchGuests() {
         UsersCalls.getNamesForIds(eventToDisplay?.guests
                 ?: listOf(), object : MyCallback<List<SimpleUserModel>>(this) {
             override fun onResponse(call: Call<List<SimpleUserModel>>?, response: Response<List<SimpleUserModel>>?) {
@@ -242,7 +320,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    private fun getCreator() {
+    private fun fetchCreator() {
         UsersCalls.getUserById(eventToDisplay?.creator ?: 1, object : MyCallback<UserModel>(this) {
             override fun onResponse(call: Call<UserModel>?, response: Response<UserModel>?) {
                 super.onResponse(call, response)
@@ -258,7 +336,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
-    class MyAdapter(val guests: List<SimpleUserModel>, val context: Context) : BaseAdapter() {
+    class MyAdapter(private val guests: List<SimpleUserModel>, val context: Context) : BaseAdapter() {
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View? {
             var view = convertView
             if (view == null) {
