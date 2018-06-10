@@ -11,8 +11,8 @@ data class PhotoModel(
         @SerializedName("EventId") var eventId: Int = 0
 ){
     companion object {
-        fun fromImgurPhoto(imgurPhotoModel: ImgurPhotoModel): PhotoModel {
-            return PhotoModel(id = 0, url = imgurPhotoModel.link, eventId = 0)
+        fun fromImgurPhoto(photo: ImgurPhotoModel?): PhotoModel {
+            return PhotoModel(id = 0, url = photo?.data?.link ?: "", eventId = 0)
         }
     }
 }

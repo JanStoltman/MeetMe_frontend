@@ -13,6 +13,7 @@ import retrofit2.Response
 abstract class MyCallback<T>(private val context: Context) : Callback<T> {
     override fun onFailure(call: Call<T>?, t: Throwable?) {
         Toast.makeText(context, R.string.no_internet_alert, Toast.LENGTH_LONG).show()
+        t?.printStackTrace()
     }
 
     override fun onResponse(call: Call<T>?, response: Response<T>?) {

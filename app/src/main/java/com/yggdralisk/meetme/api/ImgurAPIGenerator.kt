@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
  */
 class ImgurAPIGenerator {
     companion object {
-        private const val BASE_URL = "https://api.imgur.com/3"
+        private const val BASE_URL = "https://api.imgur.com"
         private const val IMGUR_CLIENT_ID = "cee3b0da0b9dedc"
         private const val IMGUR_CLIENT_SECRET = "9da96a801fcd63e27acaac1f40a48ce2a4df7daf"
 
