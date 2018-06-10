@@ -8,11 +8,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 /**
- * Created by Jan Stoltman on 4/7/18.
+ * Created by Jan Stoltman on 6/10/18.
  */
-class APIGenerator {
+class ImgurAPIGenerator {
     companion object {
-        private const val BASE_URL: String = "http://zpimeetme.azurewebsites.net"
+        private const val BASE_URL = "https://api.imgur.com/3"
+        private const val IMGUR_CLIENT_ID = "cee3b0da0b9dedc"
+        private const val IMGUR_CLIENT_SECRET = "9da96a801fcd63e27acaac1f40a48ce2a4df7daf"
 
         private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
                 .readTimeout(1, TimeUnit.MINUTES)
@@ -41,7 +43,7 @@ class APIGenerator {
                     httpClient.addInterceptor {
                         val original = it.request()
                         val request = original.newBuilder()
-                                .header("Authorization", AccessToken.getCurrentAccessToken().userId)
+                                .header("Authorization", "Client-ID $IMGUR_CLIENT_ID")
                                 .method(original.method(), original.body())
                                 .build()
 

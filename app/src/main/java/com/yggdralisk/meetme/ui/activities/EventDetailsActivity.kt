@@ -29,10 +29,10 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.EventCalls
+import com.yggdralisk.meetme.api.calls.ImgurCalls
 import com.yggdralisk.meetme.api.calls.UsersCalls
-import com.yggdralisk.meetme.api.models.EventModel
-import com.yggdralisk.meetme.api.models.SimpleUserModel
-import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.api.models.*
+import com.yggdralisk.meetme.utility.PhotoEncoder
 import com.yggdralisk.meetme.utility.TimestampManager
 import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import kotlinx.android.synthetic.main.activity_event_details.*
@@ -305,7 +305,21 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 
         val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        //TODO: Send to api/test display
+        val encoded = PhotoEncoder.encodePhoto(bitmap)
+
+        ImgurCalls.postImage(encoded, object : MyCallback<ImgurPhotoModel>(this) {
+            override fun onResponse(call: Call<ImgurPhotoModel>?, response: Response<ImgurPhotoModel>?) {
+                super.onResponse(call, response)
+
+                eventToDisplay?.let {
+                    response?.body()?.let {
+                        EventCalls.addPhoto(eventToDisplay!!.id!!,
+                                PhotoModel.fromImgurPhoto(response.body() as ImgurPhotoModel),
+                                object : MyCallback<EventModel>(this@EventDetailsActivity) {})
+                    }
+                }
+            }
+        })
     }
 
 
