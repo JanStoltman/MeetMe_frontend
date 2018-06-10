@@ -1,9 +1,9 @@
 package com.yggdralisk.meetme.api.calls
 
-import android.view.ViewDebug
 import com.yggdralisk.meetme.api.APIGenerator
 import com.yggdralisk.meetme.api.interfaces.EventInterface
 import com.yggdralisk.meetme.api.models.EventModel
+import com.yggdralisk.meetme.api.models.PhotoModel
 import retrofit2.Callback
 
 /**
@@ -53,6 +53,11 @@ class EventCalls {
 
         fun wasRated(id: Int, callback: Callback<Boolean>){
             val call = APIGenerator.createService(EventInterface::class.java).wasRated(id)
+            call.enqueue(callback)
+        }
+
+        fun addPhoto(eventId: Int, photoModel: PhotoModel, callback: Callback<EventModel>){
+            val call = APIGenerator.createService(EventInterface::class.java).addPhoto(eventId, photoModel)
             call.enqueue(callback)
         }
     }

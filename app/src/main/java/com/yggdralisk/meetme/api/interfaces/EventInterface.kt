@@ -1,6 +1,7 @@
 package com.yggdralisk.meetme.api.interfaces
 
 import com.yggdralisk.meetme.api.models.EventModel
+import com.yggdralisk.meetme.api.models.PhotoModel
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -34,4 +35,7 @@ interface EventInterface {
 
     @GET("api/Events/{id}/WasRated")
     fun wasRated(@Path("id") id: Int): Call<Boolean>
+
+    @POST("api/Events/{id}/AddPhoto")
+    fun addPhoto(@Path("id") eventId: Int, @Body photoModel: PhotoModel): Call<EventModel>
 }
