@@ -3,7 +3,6 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
@@ -29,10 +28,10 @@ import com.yggdralisk.meetme.MyApplication
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.EventCalls
+import com.yggdralisk.meetme.api.calls.ImgurCalls
 import com.yggdralisk.meetme.api.calls.UsersCalls
-import com.yggdralisk.meetme.api.models.EventModel
-import com.yggdralisk.meetme.api.models.SimpleUserModel
-import com.yggdralisk.meetme.api.models.UserModel
+import com.yggdralisk.meetme.api.models.*
+import com.yggdralisk.meetme.utility.PhotoEncoder
 import com.yggdralisk.meetme.utility.TimestampManager
 import com.yggdralisk.meetme.utility.notifications.NotificationHelper
 import kotlinx.android.synthetic.main.activity_event_details.*
@@ -82,8 +81,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun createImageFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())
-        val imageFileName = "JPEG_" + timeStamp + "_"
+        val imageFileName = "JPEG_${SimpleDateFormat("yyyyMMdd_HHmmss").format(Date())}_"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
                 imageFileName,  /* prefix */
@@ -91,7 +89,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 storageDir      /* directory */
         )
 
-        mCurrentPhotoPath = image.getAbsolutePath();
+        mCurrentPhotoPath = image.absolutePath;
         return image;
     }
 
@@ -105,7 +103,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 ex.printStackTrace()
             }
 
-            if (photoFile != null) {
+            photoFile?.let {
                 val photoURI: Uri = FileProvider.getUriForFile(this, FILE_PROVIDER_AUTHORITY_NAME, photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                 startActivityForResult(takePictureIntent, PHOTO_REQUEST);
@@ -272,10 +270,6 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
         eventName.text = eventToDisplay?.name ?: ""
         locationName.text = eventToDisplay?.locationName ?: ""
         eventDescription.text = eventToDisplay?.description ?: ""
-//        ImageLoader.getInstance()
-//                .displayImage(eventToDisplay?.qrCodeLink?.code
-//                        ?: "https://chart.googleapis.com/chart?cht=qr&chl=https%3A%2F%2Fwww.google.com%2Fmaps&chs=180x180&choe=UTF-8&chld=L|2",
-//                        qrCodeImage)
         startTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.startTime ?: 0)
         endTime.text = TimestampManager(this).toDateHourString(eventToDisplay?.endTime ?: 0)
         locationAddress.text = eventToDisplay?.address ?: ""
@@ -290,24 +284,29 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK && data != null) {
-            val extras = data.getExtras();
-            val imageBitmap = extras.get("data") as Bitmap
-            processTakenPhoto(imageBitmap)
+        if (requestCode == PHOTO_REQUEST && resultCode == RESULT_OK) {
+            processTakenPhoto()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private fun processTakenPhoto(imageBitmap: Bitmap) {
-        val bmOptions: BitmapFactory.Options = BitmapFactory.Options()
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
+    private fun processTakenPhoto() {
+        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+        val encoded = PhotoEncoder.encodePhoto(bitmap)
 
-        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        //TODO: Send to api/test display
+        ImgurCalls.postImage(encoded, object : MyCallback<ImgurPhotoModel>(this) {
+            override fun onResponse(call: Call<ImgurPhotoModel>?, response: Response<ImgurPhotoModel>?) {
+                super.onResponse(call, response)
+
+                eventToDisplay?.let {
+                    EventCalls.addPhoto(eventToDisplay!!.id!!,
+                            PhotoModel.fromImgurPhoto(response?.body()),
+                            object : MyCallback<EventModel>(this@EventDetailsActivity) {})
+                }
+            }
+        })
     }
-
 
     private fun fetchGuests() {
         UsersCalls.getNamesForIds(eventToDisplay?.guests
