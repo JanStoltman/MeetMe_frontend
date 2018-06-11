@@ -3,7 +3,6 @@ package com.yggdralisk.meetme.ui.activities
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
-import com.yggdralisk.commonintents.AlarmClockIntents.SetAlarmIntent
 import com.yggdralisk.meetme.R
 import com.yggdralisk.meetme.api.MyCallback
 import com.yggdralisk.meetme.api.calls.EventCalls
