@@ -292,7 +292,23 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun processTakenPhoto() {
-        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+        // Get the dimensions of the View
+        val targetW = 200
+        val targetH = 200
+
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
+        val photoW = bmOptions.outWidth;
+        val photoH = bmOptions.outHeight;
+
+        val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
         val encoded = PhotoEncoder.encodePhoto(bitmap)
 
         ImgurCalls.postImage(encoded, object : MyCallback<ImgurPhotoModel>(this) {

@@ -1,6 +1,5 @@
 package com.yggdralisk.meetme.api
 
-import com.facebook.AccessToken
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -17,8 +16,9 @@ class ImgurAPIGenerator {
         private const val IMGUR_CLIENT_SECRET = "9da96a801fcd63e27acaac1f40a48ce2a4df7daf"
 
         private val okHttpClient: OkHttpClient = OkHttpClient().newBuilder()
-                .readTimeout(1, TimeUnit.MINUTES)
-                .connectTimeout(1, TimeUnit.MINUTES)
+                .readTimeout(3, TimeUnit.MINUTES)
+                .connectTimeout(3, TimeUnit.MINUTES)
+                .writeTimeout(3, TimeUnit.MINUTES)
                 .build()
 
         private val builder: Retrofit.Builder = Retrofit
@@ -38,20 +38,19 @@ class ImgurAPIGenerator {
         fun <S> createService(serviceClass: Class<S>): S {
             if (!httpClient.interceptors().contains(logging)) {
                 httpClient.addInterceptor(logging)
+                httpClient.addInterceptor {
+                    val original = it.request()
+                    val request = original.newBuilder()
+                            .header("Authorization", "Client-ID $IMGUR_CLIENT_ID")
+                            .method(original.method(), original.body())
+                            .build()
 
-                if (AccessToken.getCurrentAccessToken() != null) {
-                    httpClient.addInterceptor {
-                        val original = it.request()
-                        val request = original.newBuilder()
-                                .header("Authorization", "Client-ID $IMGUR_CLIENT_ID")
-                                .method(original.method(), original.body())
-                                .build()
-
-                        it.proceed(request)
-                    }
+                    it.proceed(request)
                 }
 
-                builder.client(httpClient.build())
+                builder.client(httpClient.readTimeout(3, TimeUnit.MINUTES)
+                        .connectTimeout(3, TimeUnit.MINUTES)
+                        .writeTimeout(3, TimeUnit.MINUTES).build())
                 retrofit = builder.build()
             }
             return retrofit.create(serviceClass)
