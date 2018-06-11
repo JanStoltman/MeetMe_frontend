@@ -306,7 +306,23 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun processTakenPhoto() {
-        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+        // Get the dimensions of the View
+        val targetW = 300
+        val targetH = 300
+
+        val bmOptions = BitmapFactory.Options()
+        bmOptions.inJustDecodeBounds = true
+        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
+        val photoW = bmOptions.outWidth;
+        val photoH = bmOptions.outHeight;
+
+        val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
         val encoded = PhotoEncoder.encodePhoto(bitmap)
 
         ImgurCalls.postImage(encoded, object : MyCallback<ImgurPhotoModel>(this) {
@@ -316,7 +332,14 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 eventToDisplay?.let {
                     EventCalls.addPhoto(eventToDisplay!!.id!!,
                             PhotoModel.fromImgurPhoto(response?.body()),
-                            object : MyCallback<EventModel>(this@EventDetailsActivity) {})
+                            object : MyCallback<EventModel>(this@EventDetailsActivity) {
+                                override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                                    super.onResponse(call, response)
+                                    if(response?.isSuccessful == true){
+                                        Toast.makeText(this@EventDetailsActivity, "Photo added", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            })
                 }
             }
         })
