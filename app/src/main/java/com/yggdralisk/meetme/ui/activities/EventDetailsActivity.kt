@@ -168,7 +168,7 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setEvent() {
         populateUI()
-        (mapView as SupportMapFragment).getMapAsync(this)
+        (mapView as? SupportMapFragment)?.getMapAsync(this)
 
         if (eventToDisplay != null && eventEnded(eventToDisplay!!)) {
             joinButton.visibility = View.INVISIBLE

@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import com.nostra13.universalimageloader.core.ImageLoader
 import com.yggdralisk.meetme.R
+import kotlinx.android.synthetic.main.activity_event_gallery.*
 
 class EventGalleryActivity : AppCompatActivity() {
     companion object {
@@ -34,11 +35,21 @@ class EventGalleryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_event_gallery)
         urlList = intent.getStringArrayListExtra(PHOTO_URLS)
 
-        setImageWidth()
+        urlList?.let {
+            if(it.isEmpty()){
+                noImagesLabel.visibility = View.VISIBLE
+            }
+            else{
+                setImageWidth()
+                initializeRecyclerView()
+            }
+        }
+    }
 
+    override fun onResume() {
+        super.onResume()
+        setImageWidth()
         initializeRecyclerView()
-//        TODO dorobić jakiś komunikat jeśli brak zdjęć
-//        TODO przejścia do zdjęć
     }
 
     private fun setImageWidth() {
@@ -90,8 +101,8 @@ class EventGalleryActivity : AppCompatActivity() {
             imageWidth?.let {
                 imageView.maxWidth = imageWidth
                 imageView.minimumWidth = imageWidth
-                imageView.maxHeight = imageWidth * 9 / 16
-                imageView.minimumHeight = imageWidth * 9 / 16
+//                imageView.maxHeight = imageWidth * 9 / 16
+//                imageView.minimumHeight = imageWidth * 9 / 16
             }
             imageView.setImageDrawable(context.getDrawable(R.drawable.placeholder_thumbnail))
 
