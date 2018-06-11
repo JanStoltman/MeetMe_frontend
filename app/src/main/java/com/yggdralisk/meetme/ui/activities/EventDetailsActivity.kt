@@ -77,7 +77,21 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
             dispatchTakePhotoIntent()
             true
         }
+        R.id.menuGalleryButton -> {
+            startGalleryActivity()
+            true
+        }
+
         else -> super.onOptionsItemSelected(item)
+    }
+
+    private fun startGalleryActivity() {
+        eventToDisplay?.let {
+            val intent = Intent(this, EventGalleryActivity::class.java)
+            intent.putStringArrayListExtra(EventGalleryActivity.PHOTO_URLS, it.photosUrls as ArrayList<String>)
+            startActivity(intent)
+        }
+
     }
 
     private fun createImageFile(): File {

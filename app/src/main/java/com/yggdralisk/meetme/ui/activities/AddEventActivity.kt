@@ -136,7 +136,7 @@ class AddEventActivity : AppCompatActivity() {
                 endTime = endTime,
                 address = choosenPlace?.address?.toString(),
                 rating = 0.0,
-                photosIds = null
+                photosUrls = null
                 )
 
         postEvent(event)
