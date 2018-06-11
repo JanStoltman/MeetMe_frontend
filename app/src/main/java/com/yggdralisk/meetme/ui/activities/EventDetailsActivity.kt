@@ -293,8 +293,8 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun processTakenPhoto() {
         // Get the dimensions of the View
-        val targetW = 200
-        val targetH = 200
+        val targetW = 300
+        val targetH = 300
 
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
@@ -318,7 +318,14 @@ class EventDetailsActivity : AppCompatActivity(), OnMapReadyCallback {
                 eventToDisplay?.let {
                     EventCalls.addPhoto(eventToDisplay!!.id!!,
                             PhotoModel.fromImgurPhoto(response?.body()),
-                            object : MyCallback<EventModel>(this@EventDetailsActivity) {})
+                            object : MyCallback<EventModel>(this@EventDetailsActivity) {
+                                override fun onResponse(call: Call<EventModel>?, response: Response<EventModel>?) {
+                                    super.onResponse(call, response)
+                                    if(response?.isSuccessful == true){
+                                        Toast.makeText(this@EventDetailsActivity, "Photo added", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            })
                 }
             }
         })
