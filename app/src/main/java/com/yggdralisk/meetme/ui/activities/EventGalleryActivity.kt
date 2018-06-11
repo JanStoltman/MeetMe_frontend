@@ -2,6 +2,7 @@ package com.yggdralisk.meetme.ui.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +12,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import com.nostra13.universalimageloader.core.ImageLoader
+import com.nostra13.universalimageloader.core.assist.FailReason
+import com.nostra13.universalimageloader.core.listener.ImageLoadingListener
 import com.yggdralisk.meetme.R
 import kotlinx.android.synthetic.main.activity_event_gallery.*
 
@@ -88,16 +92,17 @@ class EventGalleryActivity : AppCompatActivity() {
 
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
             urlList?.let {
-                loadImage(it[position], viewHolder.imageView)
+                loadImage(it[position], viewHolder.imageView, viewHolder.progressBar)
             }
         }
 
 
         class ViewHolder(view : View) : RecyclerView.ViewHolder(view) {
             val imageView = view.findViewById<ImageView>(R.id.imageView2)!!
+            val progressBar = view.findViewById<ProgressBar>(R.id.galleryItemProgressBar)!!
         }
 
-        fun loadImage(url: String, imageView: ImageView){
+        fun loadImage(url: String, imageView: ImageView, progressBar: ProgressBar){
             imageWidth?.let {
                 imageView.maxWidth = imageWidth
                 imageView.minimumWidth = imageWidth
@@ -107,6 +112,28 @@ class EventGalleryActivity : AppCompatActivity() {
             imageView.setImageDrawable(context.getDrawable(R.drawable.placeholder_thumbnail))
 
             ImageLoader.getInstance().displayImage(url, imageView)
+
+            ImageLoader.getInstance().displayImage(
+                    url,
+                    imageView,
+                    object : ImageLoadingListener {
+                        override fun onLoadingComplete(imageUri: String?, view: View?, loadedImage: Bitmap?) {
+                            progressBar.visibility = View.GONE
+                        }
+
+                        override fun onLoadingStarted(imageUri: String?, view: View?) {
+                            progressBar.visibility = View.VISIBLE
+                        }
+
+                        override fun onLoadingCancelled(imageUri: String?, view: View?) {
+                            progressBar.visibility = View.GONE
+                        }
+
+                        override fun onLoadingFailed(imageUri: String?, view: View?, failReason: FailReason?) {
+                            progressBar.visibility = View.GONE
+                        }
+                    }
+            )
 
             imageView.setOnClickListener {
                 startImageActivity(url, context)
